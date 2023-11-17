@@ -1,0 +1,290 @@
+{
+  "childNodes": [
+    {
+      "tagName": "script",
+      "attrs": {
+        "setup": true
+      },
+      "childNodes": [
+        {
+          "data": "\nimport { ref } from 'vue'\n\nconst attr1 = ref(1);\nconst attr2 = ref(\"2\");\nconst attr3 = ref(3);\nconst attr4 = ref(\"4\");\nconst attr5 = ref(1);\nconst attr6 = ref(\"6\");\nconst attr7 = ref(7);\nconst attr8 = ref(8);\n"
+        }
+      ],
+      "sourceType": "vue"
+    },
+    {
+      "tagName": "template",
+      "childNodes": [
+        {
+          "tagName": "div",
+          "childNodes": [
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "single if"
+                }
+              ],
+              "logic": {
+                "if": {
+                  "type": "Identifier",
+                  "name": "attr1",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "if with else if"
+                }
+              ],
+              "logic": {
+                "if": {
+                  "type": "Identifier",
+                  "name": "attr2",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "with else if bu no else"
+                }
+              ],
+              "logic": {
+                "elif": {
+                  "type": "Identifier",
+                  "name": "attr3",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "if with else"
+                }
+              ],
+              "logic": {
+                "if": {
+                  "type": "Identifier",
+                  "name": "attr4",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "else end"
+                }
+              ],
+              "logic": {
+                "else": {
+                  "type": "Literal",
+                  "value": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "if with .. "
+                }
+              ],
+              "logic": {
+                "if": {
+                  "type": "Identifier",
+                  "name": "attr5",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "else if 6"
+                }
+              ],
+              "logic": {
+                "elif": {
+                  "type": "Identifier",
+                  "name": "attr6",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "else if 7"
+                }
+              ],
+              "logic": {
+                "elif": {
+                  "type": "Identifier",
+                  "name": "attr7",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "else if 8"
+                }
+              ],
+              "logic": {
+                "elif": {
+                  "type": "Identifier",
+                  "name": "attr8",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "else end"
+                }
+              ],
+              "logic": {
+                "else": {
+                  "type": "Literal",
+                  "value": true
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "sourceType": "vue"
+    },
+    {
+      "tagName": "style",
+      "childNodes": [
+        {
+          "data": "\n  div {\n      background-color: blue;\n  }\n  div > span {\n    background-color: red;\n    height: 100px;\n    width: 100px;\n  }\n"
+        }
+      ],
+      "sourceType": "vue",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "div"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "background-color",
+                  "value": "blue",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 7
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 29
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 3
+                },
+                "end": {
+                  "line": 4,
+                  "column": 4
+                }
+              }
+            },
+            {
+              "type": "rule",
+              "selectors": [
+                "div > span"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "background-color",
+                  "value": "red",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 26
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "height",
+                  "value": "100px",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 18
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "width",
+                  "value": "100px",
+                  "position": {
+                    "start": {
+                      "line": 8,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 17
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 3
+                },
+                "end": {
+                  "line": 9,
+                  "column": 4
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      }
+    }
+  ],
+  "sourceType": "vue",
+  "path": "entry.vue"
+}

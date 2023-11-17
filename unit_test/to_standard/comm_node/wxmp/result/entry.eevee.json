@@ -1,0 +1,130 @@
+{
+  "sourceType": "wxmp",
+  "childNodes": [
+    {
+      "childNodes": [
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "tagName": "text",
+              "childNodes": [
+                {
+                  "data": "normarl text"
+                }
+              ]
+            },
+            {
+              "data": "<!-- single line comment-->"
+            },
+            {
+              "tagName": "text",
+              "childNodes": [
+                {
+                  "data": {
+                    "type": "Identifier",
+                    "name": "dynText",
+                    "mustache": true
+                  }
+                }
+              ]
+            },
+            {
+              "data": "\n    no tag text\n    "
+            },
+            {
+              "data": "<!-- multi\n        <fakeNode>\n        <open-node\n         line comment-->"
+            },
+            {
+              "tagName": "image",
+              "attrs": {
+                "src": "abc"
+              }
+            },
+            {
+              "tagName": "text",
+              "attrs": {
+                "test": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "aa"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "bb"
+                        },
+                        "computed": false
+                      },
+                      "property": {
+                        "type": "Literal",
+                        "value": 6
+                      },
+                      "computed": true
+                    },
+                    "property": {
+                      "type": "Literal",
+                      "value": "77"
+                    },
+                    "computed": true
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "c"
+                  },
+                  "computed": false,
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "view",
+              "attrs": {
+                "attr0": "</view>",
+                "attr123": {
+                  "type": "BinaryExpression",
+                  "operator": "+",
+                  "left": {
+                    "type": "BinaryExpression",
+                    "operator": "+",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "attr1"
+                    },
+                    "right": {
+                      "type": "Identifier",
+                      "name": "attr2"
+                    },
+                    "mustache": true
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "value": "attr3"
+                  }
+                },
+                "data-attr": "<view>"
+              }
+            }
+          ]
+        },
+        {
+          "tagName": "text",
+          "childNodes": [
+            {
+              "data": "multi node"
+            }
+          ]
+        }
+      ],
+      "sourceType": "wxml",
+      "path": "entry.wxml",
+      "tagName": "template"
+    }
+  ]
+}

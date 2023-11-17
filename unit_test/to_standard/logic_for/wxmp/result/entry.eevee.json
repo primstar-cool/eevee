@@ -1,0 +1,490 @@
+{
+  "sourceType": "wxmp",
+  "childNodes": [
+    {
+      "childNodes": [
+        {
+          "tagName": "view",
+          "logic": {
+            "for": {
+              "type": "Identifier",
+              "name": "loopData",
+              "mustache": true
+            },
+            "for-index": {
+              "type": "Literal",
+              "value": "index"
+            },
+            "for-item": {
+              "type": "Literal",
+              "value": "item"
+            },
+            "key": {
+              "type": "Identifier",
+              "name": "item",
+              "mustache": true
+            }
+          }
+        },
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "data": {
+                "type": "BinaryExpression",
+                "operator": "+",
+                "left": {
+                  "type": "BinaryExpression",
+                  "operator": "+",
+                  "left": {
+                    "type": "Literal",
+                    "value": "\n"
+                  },
+                  "right": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "Identifier",
+                      "name": "item2"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "text"
+                    },
+                    "computed": false,
+                    "mustache": true
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "\n"
+                }
+              }
+            }
+          ],
+          "logic": {
+            "for": {
+              "type": "Identifier",
+              "name": "loopData",
+              "mustache": true
+            },
+            "for-index": {
+              "type": "Literal",
+              "value": "index"
+            },
+            "for-item": {
+              "type": "Literal",
+              "value": "item2"
+            },
+            "key": {
+              "type": "MemberExpression",
+              "object": {
+                "type": "Identifier",
+                "name": "item2"
+              },
+              "property": {
+                "type": "Identifier",
+                "name": "id"
+              },
+              "computed": false,
+              "mustache": true
+            }
+          }
+        },
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "data": {
+                "type": "BinaryExpression",
+                "operator": "+",
+                "left": {
+                  "type": "BinaryExpression",
+                  "operator": "+",
+                  "left": {
+                    "type": "BinaryExpression",
+                    "operator": "+",
+                    "left": {
+                      "type": "BinaryExpression",
+                      "operator": "+",
+                      "left": {
+                        "type": "Literal",
+                        "value": "\n"
+                      },
+                      "right": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "item3"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "index"
+                        },
+                        "computed": false,
+                        "mustache": true
+                      }
+                    },
+                    "right": {
+                      "type": "Literal",
+                      "value": ": "
+                    }
+                  },
+                  "right": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "Identifier",
+                      "name": "item3"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "text"
+                    },
+                    "computed": false,
+                    "mustache": true
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "\n"
+                }
+              }
+            },
+            {
+              "tagName": "view",
+              "childNodes": [
+                {
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "  innerText"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "logic": {
+            "for": {
+              "type": "Identifier",
+              "name": "loopData",
+              "mustache": true
+            },
+            "for-index": {
+              "type": "Literal",
+              "value": "index"
+            },
+            "for-item": {
+              "type": "Literal",
+              "value": "item3"
+            },
+            "key": {
+              "type": "MemberExpression",
+              "object": {
+                "type": "Identifier",
+                "name": "item3"
+              },
+              "property": {
+                "type": "Identifier",
+                "name": "id3"
+              },
+              "computed": false,
+              "mustache": true
+            },
+            "if": {
+              "type": "BinaryExpression",
+              "operator": "&",
+              "left": {
+                "type": "Identifier",
+                "name": "index"
+              },
+              "right": {
+                "type": "Literal",
+                "value": 1
+              },
+              "mustache": true
+            }
+          }
+        },
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "data": {
+                "type": "BinaryExpression",
+                "operator": "+",
+                "left": {
+                  "type": "BinaryExpression",
+                  "operator": "+",
+                  "left": {
+                    "type": "BinaryExpression",
+                    "operator": "+",
+                    "left": {
+                      "type": "BinaryExpression",
+                      "operator": "+",
+                      "left": {
+                        "type": "Literal",
+                        "value": "\n"
+                      },
+                      "right": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "item4"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "index"
+                        },
+                        "computed": false,
+                        "mustache": true
+                      }
+                    },
+                    "right": {
+                      "type": "Literal",
+                      "value": ": "
+                    }
+                  },
+                  "right": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "Identifier",
+                      "name": "item4"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "text"
+                    },
+                    "computed": false,
+                    "mustache": true
+                  }
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": "\n"
+                }
+              }
+            }
+          ],
+          "logic": {
+            "for": {
+              "type": "Identifier",
+              "name": "loopData",
+              "mustache": true
+            },
+            "for-index": {
+              "type": "Literal",
+              "value": "index"
+            },
+            "for-item": {
+              "type": "Literal",
+              "value": "item4"
+            },
+            "key": {
+              "type": "MemberExpression",
+              "object": {
+                "type": "Identifier",
+                "name": "item4"
+              },
+              "property": {
+                "type": "Identifier",
+                "name": "id4"
+              },
+              "computed": false,
+              "mustache": true
+            },
+            "if": {
+              "type": "Identifier",
+              "name": "outsideIf",
+              "mustache": true
+            }
+          }
+        },
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "tagName": "view",
+              "childNodes": [
+                {
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "conflict for-item name"
+                    }
+                  ],
+                  "logic": {
+                    "for": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "Identifier",
+                        "name": "item6"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "subSubArr"
+                      },
+                      "computed": false,
+                      "mustache": true
+                    },
+                    "for-index": {
+                      "type": "Literal",
+                      "value": "index"
+                    },
+                    "for-item": {
+                      "type": "Literal",
+                      "value": "item5"
+                    },
+                    "key": {
+                      "type": "Identifier",
+                      "name": "item5",
+                      "mustache": true
+                    }
+                  }
+                },
+                {
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "conflict for-index name"
+                    }
+                  ],
+                  "logic": {
+                    "for": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "Identifier",
+                        "name": "item6"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "subSubArr"
+                      },
+                      "computed": false,
+                      "mustache": true
+                    },
+                    "for-index": {
+                      "type": "Literal",
+                      "value": "index"
+                    },
+                    "for-item": {
+                      "type": "Literal",
+                      "value": "item"
+                    },
+                    "key": {
+                      "type": "Identifier",
+                      "name": "item",
+                      "mustache": true
+                    }
+                  }
+                },
+                {
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "nothing conflict"
+                    }
+                  ],
+                  "logic": {
+                    "for": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "Identifier",
+                        "name": "item6"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "subSubArr"
+                      },
+                      "computed": false,
+                      "mustache": true
+                    },
+                    "for-index": {
+                      "type": "Literal",
+                      "value": "index7"
+                    },
+                    "for-item": {
+                      "type": "Literal",
+                      "value": "item7"
+                    },
+                    "key": {
+                      "type": "Identifier",
+                      "name": "item7",
+                      "mustache": true
+                    }
+                  }
+                }
+              ],
+              "logic": {
+                "for": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "Identifier",
+                    "name": "item5"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "subArr"
+                  },
+                  "computed": false,
+                  "mustache": true
+                },
+                "for-index": {
+                  "type": "Literal",
+                  "value": "index"
+                },
+                "for-item": {
+                  "type": "Literal",
+                  "value": "item6"
+                },
+                "key": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "Identifier",
+                    "name": "item6"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "idSub"
+                  },
+                  "computed": false,
+                  "mustache": true
+                }
+              }
+            }
+          ],
+          "logic": {
+            "for": {
+              "type": "Identifier",
+              "name": "loopData",
+              "mustache": true
+            },
+            "for-index": {
+              "type": "Literal",
+              "value": "index5"
+            },
+            "for-item": {
+              "type": "Literal",
+              "value": "item5"
+            },
+            "key": {
+              "type": "MemberExpression",
+              "object": {
+                "type": "Identifier",
+                "name": "item5"
+              },
+              "property": {
+                "type": "Identifier",
+                "name": "id5"
+              },
+              "computed": false,
+              "mustache": true
+            }
+          }
+        }
+      ],
+      "sourceType": "wxml",
+      "path": "entry.wxml",
+      "tagName": "template"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+<view wx:for="{{loopData}}" wx:key="*this"/>
+
+<view wx:for="{{loopData}}" wx:for-item="item2" wx:key="id">
+{{item2.text}}
+</view>
+
+<view wx:if="{{index & 1}}" wx:for="{{loopData}}" wx:for-item="item3" wx:key="id3">
+{{item3.index}}: {{item3.text}}
+<view><text>  innerText</text></view>
+</view>
+
+<view wx:if="{{outsideIf}}" wx:for="{{loopData}}" wx:for-item="item4" wx:key="id4">
+{{item4.index}}: {{item4.text}}
+</view>
+
+<view wx:for="{{loopData}}" wx:for-item="item5" wx:for-index="index5" wx:key="id5">
+    <view wx:for="{{item5.subArr}}" wx:for-item="item6" wx:key="idSub">
+        <text wx:for="{{item6.subSubArr}}" wx:for-item="item5">conflict for-item name</text>
+        <text wx:for="{{item6.subSubArr}}" wx:for-index="index">conflict for-index name</text>
+        <text wx:for="{{item6.subSubArr}}" wx:for-item="item7"  wx:for-index="index7">nothing conflict</text>
+    </view>
+</view>

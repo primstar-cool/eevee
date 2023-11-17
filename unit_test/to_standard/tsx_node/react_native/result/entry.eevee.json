@@ -1,0 +1,281 @@
+{
+  "childNodes": [
+    {
+      "tagName": "template",
+      "childNodes": [
+        {
+          "attrs": {
+            "style": {
+              "type": "CallExpression",
+              "callee": {
+                "type": "Identifier",
+                "name": "stringifyStyle"
+              },
+              "arguments": [
+                {
+                  "type": "CallExpression",
+                  "callee": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "Identifier",
+                      "name": "@EXTERNAL_SCOPE__Object"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "name": "assign"
+                    },
+                    "computed": false
+                  },
+                  "arguments": [
+                    {
+                      "type": "ObjectExpression",
+                      "properties": []
+                    },
+                    {
+                      "type": "ObjectExpression",
+                      "properties": [
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "backgroundColor"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "red"
+                          }
+                        },
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "width"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "400rpx"
+                          }
+                        },
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "height"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "150rpx"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ObjectExpression",
+                      "properties": [
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "backgroundColor"
+                          },
+                          "value": {
+                            "type": "ConditionalExpression",
+                            "test": {
+                              "type": "Identifier",
+                              "name": "@LOCAL__isDarkMode"
+                            },
+                            "consequent": {
+                              "type": "Literal",
+                              "value": "#000000"
+                            },
+                            "alternate": {
+                              "type": "Literal",
+                              "value": "#FFFFFF"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "mustache": true
+            }
+          },
+          "tagName": "view",
+          "childNodes": [
+            {
+              "attrs": {
+                "style": {
+                  "type": "CallExpression",
+                  "callee": {
+                    "type": "Identifier",
+                    "name": "stringifyStyle"
+                  },
+                  "arguments": [
+                    {
+                      "type": "ObjectExpression",
+                      "properties": [
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "backgroundColor"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "green"
+                          }
+                        },
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "width"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "100rpx"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "mustache": true
+                }
+              },
+              "tagName": "view",
+              "childNodes": [
+                {
+                  "attrs": null,
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "it's text"
+                    }
+                  ],
+                  "logic": {
+                    "rks": []
+                  }
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "@EXTERNAL_SCOPE__styles"
+                ]
+              }
+            },
+            {
+              "attrs": {
+                "style": {
+                  "type": "CallExpression",
+                  "callee": {
+                    "type": "Identifier",
+                    "name": "stringifyStyle"
+                  },
+                  "arguments": [
+                    {
+                      "type": "ObjectExpression",
+                      "properties": [
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "backgroundColor"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "yellow"
+                          }
+                        },
+                        {
+                          "key": {
+                            "type": "Literal",
+                            "value": "width"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "300rpx"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "mustache": true
+                }
+              },
+              "tagName": "view",
+              "childNodes": [
+                {
+                  "attrs": null,
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": "it's another text"
+                    }
+                  ],
+                  "logic": {
+                    "rks": []
+                  }
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "@EXTERNAL_SCOPE__styles"
+                ]
+              }
+            }
+          ],
+          "logic": {
+            "rks": [
+              "@EXTERNAL_SCOPE__styles",
+              "@LOCAL__isDarkMode"
+            ]
+          }
+        }
+      ],
+      "sourceType": "react_native"
+    },
+    {
+      "tagName": "context",
+      "childNodes": [
+        {
+          "tagName": "script",
+          "attrs": {
+            "name": "render"
+          },
+          "childNodes": [
+            {
+              "data": "export default function () {\n  function _getClosureResult() {\n    var localFuncVarA = Date.now();\n    return 50 + localFuncVarA;\n  }\n  const isDarkMode = _getClosureResult() && Math.random() < 0.5;\n  return {\n    isDarkMode\n  };\n}"
+            },
+            {
+              "data": "/*export default function () {\n    function _getClosureResult() {\n        var localFuncVarA = Date.now();\n        return 50 + localFuncVarA;\n    }\n    const isDarkMode = _getClosureResult() && Math.random() < 0.5;\n    return { isDarkMode };\n}*/"
+            }
+          ],
+          "logic": {
+            "rks": [
+              "@EXTERNAL_SCOPE__Date",
+              "@LOCAL_FUNC___getClosureResult",
+              "@EXTERNAL_SCOPE__Math"
+            ]
+          }
+        },
+        {
+          "tagName": "identifier",
+          "id": "isDarkMode",
+          "scope": "@LOCAL__",
+          "kind": "const",
+          "type": "any",
+          "code": "export default function () /*isDarkMode*/ {\n  function _getClosureResult() {\n    var localFuncVarA = Date.now();\n    return 50 + localFuncVarA;\n  }\n  const isDarkMode = _getClosureResult() && Math.random() < 0.5;\n  return isDarkMode;\n}",
+          "logic": {
+            "rks": [
+              "@EXTERNAL_SCOPE__Date",
+              "@LOCAL_FUNC___getClosureResult",
+              "@EXTERNAL_SCOPE__Math"
+            ]
+          }
+        },
+        {
+          "tagName": "identifier",
+          "id": "_getClosureResult",
+          "scope": "@LOCAL_FUNC__"
+        }
+      ],
+      "sourceType": "react_native"
+    }
+  ],
+  "sourceType": "react_native"
+}

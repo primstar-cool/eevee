@@ -1,0 +1,7 @@
+<view><text>normarl text</text><!-- single line comment--><text>{{dynText}}</text>
+    no tag text
+    <!-- multi
+        <fakeNode>
+        <open-node
+         line comment--><image src="abc"></image><view attr0="</view>" attr123="{{attr1 + attr2}}attr3" data-attr="<view>"></view></view>
+<text>multi node</text>

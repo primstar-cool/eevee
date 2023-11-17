@@ -1,0 +1,32 @@
+.tag-view {
+  width: 0.13330078125vw;
+  height: 0.13330078125vw;
+}
+.classA {
+  width: 0.2666015625vw;
+  height: 0.2666015625vw;
+}
+.big {
+  width: 0.7333984375vw;
+}
+.font-color {
+  color: #FFFF00;
+}
+.bg-color {
+  background-color: #FFC0CB;
+}
+.tag-view_x_type-1 {
+  background-color: #FF0000;
+  width: 0.39990234375vw;
+}
+.tag-view_x_type-2 {
+  background-color: #0000FF;
+  border-width: 2px;
+}
+.tag-view_x_type-3 {
+  background-color: #008000;
+  margin: 10vw;
+}
+.big_7_sub-text {
+  color: #800080;
+}

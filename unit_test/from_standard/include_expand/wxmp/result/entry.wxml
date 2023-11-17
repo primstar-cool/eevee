@@ -1,0 +1,2 @@
+<text>include test</text>
+<view><include src="./folder/include_lv0.wxml" wx:if="{{abc}}"></include><include src="/folder/include_abs.wxml"></include></view>

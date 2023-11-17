@@ -1,0 +1,28 @@
+{
+  "name": "eevee-suit",
+  "version": "0.0.2",
+  "description": "",
+  "main": "",
+  "dependencies": {
+    "@babel/core": "^7.23.2",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-preset-typescript": "^7.0.0-alpha.19",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "rollup": "^3.1.0",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node ./unit_test/to_standard_test.js && node ./unit_test/from_standard_test.js"
+  },
+  "keywords": [
+    "harmony",
+    "arkts",
+    "react",
+    "react native",
+    "vue"
+  ],
+  "author": "primstar",
+  "license": "MPL"
+}

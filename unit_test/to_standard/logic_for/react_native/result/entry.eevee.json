@@ -1,0 +1,257 @@
+{
+  "childNodes": [
+    {
+      "tagName": "template",
+      "childNodes": [
+        {
+          "attrs": null,
+          "tagName": "view",
+          "childNodes": [
+            {
+              "attrs": null,
+              "tagName": "text",
+              "childNodes": [
+                {
+                  "data": {
+                    "type": "BinaryExpression",
+                    "operator": "+",
+                    "left": {
+                      "type": "BinaryExpression",
+                      "operator": "+",
+                      "left": {
+                        "type": "BinaryExpression",
+                        "operator": "+",
+                        "left": {
+                          "type": "BinaryExpression",
+                          "operator": "+",
+                          "left": {
+                            "type": "BinaryExpression",
+                            "operator": "+",
+                            "left": {
+                              "type": "Literal",
+                              "value": "id:"
+                            },
+                            "right": {
+                              "type": "Identifier",
+                              "name": "idx"
+                            }
+                          },
+                          "right": {
+                            "type": "Literal",
+                            "value": ", name:"
+                          }
+                        },
+                        "right": {
+                          "type": "MemberExpression",
+                          "object": {
+                            "type": "Identifier",
+                            "name": "item"
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "name": "name"
+                          },
+                          "computed": false
+                        }
+                      },
+                      "right": {
+                        "type": "Literal",
+                        "value": ", pt: "
+                      }
+                    },
+                    "right": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "Identifier",
+                        "name": "item"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "point"
+                      },
+                      "computed": false
+                    },
+                    "mustache": true
+                  }
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "loopData",
+                  "idx",
+                  "item"
+                ],
+                "for": {
+                  "type": "Identifier",
+                  "name": "loopData",
+                  "mustache": true
+                },
+                "for-item": {
+                  "type": "Literal",
+                  "value": "item"
+                },
+                "for-index": {
+                  "type": "Literal",
+                  "value": "idx"
+                }
+              }
+            },
+            {
+              "attrs": null,
+              "tagName": "view",
+              "childNodes": [
+                {
+                  "attrs": null,
+                  "tagName": "text",
+                  "childNodes": [
+                    {
+                      "data": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "item2"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "name"
+                        },
+                        "computed": false,
+                        "mustache": true
+                      }
+                    }
+                  ],
+                  "logic": {
+                    "rks": [
+                      "item2"
+                    ]
+                  }
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "loopData",
+                  "item2"
+                ],
+                "for": {
+                  "type": "Identifier",
+                  "name": "loopData",
+                  "mustache": true
+                },
+                "for-item": {
+                  "type": "Literal",
+                  "value": "item2"
+                }
+              }
+            },
+            {
+              "attrs": null,
+              "tagName": "text",
+              "childNodes": [
+                {
+                  "data": "empty"
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "loopData"
+                ],
+                "for": {
+                  "type": "Identifier",
+                  "name": "loopData",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "attrs": null,
+              "tagName": "text",
+              "childNodes": [
+                {
+                  "data": {
+                    "type": "Literal",
+                    "value": "nouse"
+                  }
+                }
+              ],
+              "logic": {
+                "rks": [
+                  "loopData"
+                ],
+                "for": {
+                  "type": "Identifier",
+                  "name": "loopData",
+                  "mustache": true
+                },
+                "for-item": {
+                  "type": "Literal",
+                  "value": "item3"
+                }
+              }
+            }
+          ],
+          "logic": {
+            "rks": [
+              "loopData",
+              "idx",
+              "item",
+              "item2"
+            ]
+          }
+        }
+      ],
+      "sourceType": "react_native"
+    },
+    {
+      "tagName": "context",
+      "childNodes": [
+        {
+          "tagName": "script",
+          "attrs": {
+            "name": "render"
+          },
+          "childNodes": [
+            {
+              "data": "export default function () {\n  return {};\n}"
+            },
+            {
+              "data": "/*export default function () {\n    return {};\n}*/"
+            }
+          ],
+          "logic": {
+            "rks": []
+          }
+        },
+        {
+          "tagName": "identifier",
+          "id": "loopData",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        },
+        {
+          "tagName": "identifier",
+          "id": "idx",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        },
+        {
+          "tagName": "identifier",
+          "id": "item",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        },
+        {
+          "tagName": "identifier",
+          "id": "item2",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        }
+      ],
+      "sourceType": "react_native"
+    }
+  ],
+  "sourceType": "react_native"
+}

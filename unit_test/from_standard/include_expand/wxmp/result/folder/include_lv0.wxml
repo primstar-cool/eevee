@@ -1,0 +1,2 @@
+<text>it is included wxml</text>
+<include src="./include_lv1.wxml"></include>

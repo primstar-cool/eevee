@@ -1,0 +1,13 @@
+text {
+  color: red;
+}
+
+view {
+  width: 100vw;
+}
+
+@import "./folder/import_lv0.wxss";
+
+/* @import "./import_comment.wxss"; it is a import in comment will ignore */
+
+@import "/folder/import_abs.wxss";

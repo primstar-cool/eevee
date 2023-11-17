@@ -1,0 +1,1 @@
+<view><text wx:for="{{loopData}}" for-item="item" for-index="idx">{{'id:' + idx + ', name:' + item.name + ', pt: ' + item.point}}</text><view wx:for="{{loopData}}" for-item="item2"><text>{{item2.name}}</text></view><text wx:for="{{loopData}}">empty</text><text wx:for="{{loopData}}" for-item="item3">nouse</text></view>

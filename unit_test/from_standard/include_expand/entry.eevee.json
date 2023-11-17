@@ -1,0 +1,369 @@
+{
+  "sourceType": "wxmp",
+  "childNodes": [
+    {
+      "childNodes": [
+        {
+          "tagName": "text",
+          "childNodes": [
+            {
+              "data": "include test"
+            }
+          ]
+        },
+        {
+          "tagName": "view",
+          "childNodes": [
+            {
+              "tagName": "include",
+              "attrs": {
+                "src": "./folder/include_lv0.wxml"
+              },
+              "includedContent": {
+                "childNodes": [
+                  {
+                    "tagName": "text",
+                    "childNodes": [
+                      {
+                        "data": "it is included wxml"
+                      }
+                    ],
+                    "logic": {
+                      "if": {
+                        "type": "Identifier",
+                        "name": "bcd",
+                        "mustache": true
+                      }
+                    }
+                  },
+                  {
+                    "tagName": "include",
+                    "attrs": {
+                      "src": "./include_lv1.wxml"
+                    },
+                    "includedContent": {
+                      "childNodes": [
+                        {
+                          "tagName": "text",
+                          "childNodes": [
+                            {
+                              "data": "it is included wxml in a sub wxml"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "sourceType": "wxml"
+                  }
+                ]
+              },
+              "sourceType": "wxml",
+              "logic": {
+                "if": {
+                  "type": "Identifier",
+                  "name": "abc",
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "include",
+              "attrs": {
+                "src": "/folder/include_abs.wxml"
+              },
+              "includedContent": {
+                "childNodes": [
+                  {
+                    "tagName": "text",
+                    "childNodes": [
+                      {
+                        "data": "it is included wxml by abs path"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "sourceType": "wxml"
+            }
+          ]
+        }
+      ],
+      "sourceType": "wxml",
+      "path": "entry.wxml",
+      "tagName": "template"
+    },
+    {
+      "tagName": "style",
+      "sourceType": "wxss",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "text"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "color",
+                  "value": "red",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 15
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "line": 4,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "type": "rule",
+              "selectors": [
+                "view"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "width",
+                  "value": "100vw",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 17
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 6,
+                  "column": 1
+                },
+                "end": {
+                  "line": 8,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "type": "import",
+              "import": "\"./folder/import_lv0.wxss\"",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 1
+                },
+                "end": {
+                  "line": 10,
+                  "column": 36
+                }
+              }
+            },
+            {
+              "type": "comment",
+              "comment": " @import \"./import_comment.wxss\"; it is a import in comment will ignore ",
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 1
+                },
+                "end": {
+                  "line": 11,
+                  "column": 77
+                }
+              }
+            },
+            {
+              "type": "import",
+              "import": "\"/folder/import_abs.wxss\"",
+              "position": {
+                "start": {
+                  "line": 12,
+                  "column": 1
+                },
+                "end": {
+                  "line": 12,
+                  "column": 35
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      },
+      "src": "entry.wxss"
+    },
+    {
+      "tagName": "style",
+      "sourceType": "wxss",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "text"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "font-size",
+                  "value": "30px",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 20
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "line": 3,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "type": "import",
+              "import": "\"./import_lv1.wxss\"",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1
+                },
+                "end": {
+                  "line": 5,
+                  "column": 29
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      },
+      "src": "folder/import_lv0.wxss"
+    },
+    {
+      "tagName": "style",
+      "sourceType": "wxss",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "view"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "height",
+                  "value": "50vh",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 17
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "line": 4,
+                  "column": 2
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      },
+      "src": "folder/import_abs.wxss"
+    },
+    {
+      "tagName": "style",
+      "sourceType": "wxss",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "text"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "font-weight",
+                  "value": "bold",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 21
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "line": 4,
+                  "column": 2
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      },
+      "src": "folder/import_lv1.wxss"
+    }
+  ]
+}

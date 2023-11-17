@@ -1,0 +1,9 @@
+<view s-for="(item ,index) in loopData" s-key="item"></view>
+<view s-for="(item2 ,index) in loopData" s-key="item2.id">
+{{item2.text}}
+</view>
+<view style="{{index % 2 ? 'display:none;' : ''}}" s-for="(item3 ,index) in loopData" s-key="item3.id3">{{index % 2 ? '\n' + item3.index + ': ' + item3.text + '\n' : ''}}<view s-if="{{index % 2}}"><text>{{"  "}}innerText</text></view></view>
+<view s-for="(item4 ,index) in loopData" s-key="item4.id4" s-if="{{outsideIf}}">
+{{item4.index}}: {{item4.text}}
+</view>
+<view s-for="(item5 ,index5) in loopData" s-key="item5.id5"><view s-for="(item6 ,index) in item5.subArr" s-key="item6.idSub"><text s-for="(item5 ,index) in item6.subSubArr" s-key="item5">conflict for-item name</text><text s-for="(item ,index) in item6.subSubArr" s-key="item">conflict for-index name</text><text s-for="(item7 ,index7) in item6.subSubArr" s-key="item7">nothing conflict</text></view></view>

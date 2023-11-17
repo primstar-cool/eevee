@@ -1,0 +1,7 @@
+<div><span class="wxmp-text">normarl text</span><!-- single line comment--><span class="wxmp-text">{{dynText}}</span>
+    no tag text
+    <!-- multi
+        <fakeNode>
+        <open-node
+         line comment--><img src="abc"/><div attr0="</view>" data-attr="&quot;<view>&quot;" data-__data-set-need-parse="1" :attr123="attr1 + attr2 + 'attr3'"></div></div>
+<span class="wxmp-text">multi node</span>

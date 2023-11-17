@@ -1,0 +1,5 @@
+text {
+  font-size: 30px;
+}
+
+@import "./import_lv1.wxss";

@@ -1,0 +1,11 @@
+<div v-for="(item ,index) in loopData" :key="item"></div>
+<div v-for="(item2 ,index) in loopData" :key="item2.id">
+{{item2.text}}
+</div>
+<div v-for="(item3 ,index) in loopData.filter((item3,index) => (index & 1))" :key="item3.id3">
+{{item3.index}}: {{item3.text}}
+<div><span class="wxmp-text">  innerText</span></div></div>
+<div v-for="(item4 ,index) in loopData" :key="item4.id4" v-if="outsideIf">
+{{item4.index}}: {{item4.text}}
+</div>
+<div v-for="(item5 ,index5) in loopData" :key="item5.id5"><div v-for="(item6 ,index) in item5.subArr" :key="item6.idSub"><span class="wxmp-text" v-for="(item5 ,index) in item6.subSubArr" :key="item5">conflict for-item name</span><span class="wxmp-text" v-for="(item ,index) in item6.subSubArr" :key="item">conflict for-index name</span><span class="wxmp-text" v-for="(item7 ,index7) in item6.subSubArr" :key="item7">nothing conflict</span></div></div>

@@ -1,0 +1,11 @@
+<view class='classA{{isBig? " big":""}}'>
+    <text class="sub-text"/>
+</view>
+<view id="{{idTest ? 'idT' : 'idF'}}-extra" class="classB">
+    <text class="sub-text"/>
+</view>
+
+<text class='classC{{fontColor? " font-color":""}}{{bgColor? " bg-color":""}}'/>
+
+<view class='type-{{is1? "1" : (is2 ? "2" : "3")}}'/>
+

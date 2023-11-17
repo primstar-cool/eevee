@@ -1,0 +1,27 @@
+span {
+  color: red;
+}
+
+div {
+  width: 100vw;
+}
+
+/*expand import content from "./folder/import_lv0.wxss" by "entry.wxss"*/
+
+span {
+  font-size: 30px;
+}
+
+/*expand import content from "./import_lv1.wxss" by "folder/import_lv0.wxss"*/
+
+span {
+  font-weight: bold;
+}
+
+/* @import "./import_comment.wxss"; it is a import in comment will ignore */
+
+/*expand import content from "/folder/import_abs.wxss" by "entry.wxss"*/
+
+div {
+  height: 50vh;
+}

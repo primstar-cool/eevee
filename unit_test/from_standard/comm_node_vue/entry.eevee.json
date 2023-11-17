@@ -1,0 +1,277 @@
+{
+  "childNodes": [
+    {
+      "tagName": "script",
+      "attrs": {
+        "setup": true
+      },
+      "childNodes": [
+        {
+          "data": "\nimport { ref } from 'vue'\n\nconst dynText = ref('Hello World!');\nconst attr1 = ref(1);\nconst attr2 = ref(\"2\");\n\n"
+        }
+      ],
+      "sourceType": "vue"
+    },
+    {
+      "tagName": "template",
+      "childNodes": [
+        {
+          "tagName": "div",
+          "childNodes": [
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": "normarl text"
+                }
+              ]
+            },
+            {
+              "data": "<!-- single line comment-->"
+            },
+            {
+              "tagName": "span",
+              "childNodes": [
+                {
+                  "data": {
+                    "type": "Identifier",
+                    "name": "dynText",
+                    "mustache": true
+                  }
+                }
+              ]
+            },
+            {
+              "data": "\n    no tag text\n    "
+            },
+            {
+              "data": "<!-- multi\n        <fakeNode>\n        <open-node\n         line comment-->"
+            },
+            {
+              "tagName": "image",
+              "attrs": {
+                "src": "abc"
+              }
+            },
+            {
+              "tagName": "text",
+              "attrs": {
+                "test": {
+                  "type": "MemberExpression",
+                  "object": {
+                    "type": "MemberExpression",
+                    "object": {
+                      "type": "MemberExpression",
+                      "object": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "aa"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "name": "bb"
+                        },
+                        "computed": false
+                      },
+                      "property": {
+                        "type": "Literal",
+                        "value": 6
+                      },
+                      "computed": true
+                    },
+                    "property": {
+                      "type": "Literal",
+                      "value": "77"
+                    },
+                    "computed": true
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "c"
+                  },
+                  "computed": false,
+                  "mustache": true
+                }
+              }
+            },
+            {
+              "tagName": "div",
+              "attrs": {
+                "attr0": "</div>",
+                "data-attr": "<div>",
+                "attr123": {
+                  "type": "BinaryExpression",
+                  "operator": "+",
+                  "left": {
+                    "type": "BinaryExpression",
+                    "operator": "+",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "attr1"
+                    },
+                    "right": {
+                      "type": "Identifier",
+                      "name": "attr2"
+                    }
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "value": "attr3"
+                  },
+                  "mustache": true
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "sourceType": "vue"
+    },
+    {
+      "tagName": "style",
+      "childNodes": [
+        {
+          "data": "\n  div {\n      background-color: blue;\n  }\n  div > div {\n    background-color: red;\n    height: 100px;\n    width: 100px;\n    display: flex;\n    flex-direction: row;\n  }\n"
+        }
+      ],
+      "sourceType": "vue",
+      "styleContent": {
+        "type": "stylesheet",
+        "stylesheet": {
+          "rules": [
+            {
+              "type": "rule",
+              "selectors": [
+                "div"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "background-color",
+                  "value": "blue",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 7
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 29
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 3
+                },
+                "end": {
+                  "line": 4,
+                  "column": 4
+                }
+              }
+            },
+            {
+              "type": "rule",
+              "selectors": [
+                "div > div"
+              ],
+              "declarations": [
+                {
+                  "type": "declaration",
+                  "property": "background-color",
+                  "value": "red",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 26
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "height",
+                  "value": "100px",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 18
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "width",
+                  "value": "100px",
+                  "position": {
+                    "start": {
+                      "line": 8,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 17
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "display",
+                  "value": "flex",
+                  "position": {
+                    "start": {
+                      "line": 9,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 18
+                    }
+                  }
+                },
+                {
+                  "type": "declaration",
+                  "property": "flex-direction",
+                  "value": "row",
+                  "position": {
+                    "start": {
+                      "line": 10,
+                      "column": 5
+                    },
+                    "end": {
+                      "line": 10,
+                      "column": 24
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 3
+                },
+                "end": {
+                  "line": 11,
+                  "column": 4
+                }
+              }
+            }
+          ],
+          "parsingErrors": []
+        }
+      }
+    }
+  ],
+  "sourceType": "vue",
+  "path": "entry.vue"
+}

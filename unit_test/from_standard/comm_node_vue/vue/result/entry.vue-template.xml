@@ -1,0 +1,6 @@
+<div><span>normarl text</span><!-- single line comment--><span>{{dynText}}</span>
+    no tag text
+    <!-- multi
+        <fakeNode>
+        <open-node
+         line comment--><image src="abc"></image><text :test="aa.bb[6]['77'].c"></text><div attr0="</div>" data-attr="<div>" :attr123="attr1 + attr2 + 'attr3'"></div></div>

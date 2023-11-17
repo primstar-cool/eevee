@@ -1,0 +1,1 @@
+<div class="rn-view"><text v-for="(item ,idx) in loopData">{{'id:' + idx + ', name:' + item.name + ', pt: ' + item.point}}</text><div class="rn-view" v-for="(item2) in loopData"><text>{{item2.name}}</text></div><text v-for="(_$_item) in loopData">empty</text><text v-for="(item3) in loopData">nouse</text></div>
