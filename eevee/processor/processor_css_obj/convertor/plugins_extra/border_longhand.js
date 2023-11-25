@@ -29,7 +29,20 @@ module.exports = () => {
    */
   function replacer(node, container) {
     // 查询value值
-    const vals = (node.value || '').split(/\s+/g).filter(item => item && item.length);
+
+    const isImportant = (node.value || '').includes("!important");
+    
+    // if (isImportant) debugger;
+
+    let rgbIndex = node.value.indexOf("rgb");
+
+    if (rgbIndex !== -1) {
+      let endsC = node.value.indexOf(")", rgbIndex);
+      node.value = node.value.substr(0, rgbIndex) + node.value.substring(rgbIndex, endsC).replace(/\s/g, "") + node.value.substr(endsC)
+      // debugger
+    }
+
+    const vals = (node.value || '').replace("!important", "").trim().split(/\s+/g).filter(item => item && item.length);
 
     let replaceNodes = null;
     let reNodeIndex = null;
@@ -44,7 +57,15 @@ module.exports = () => {
       } else {
         return createDeclaration(v, initialValueMap[v], node.parent);
       }
-    })
+    });
+
+
+    if (isImportant) {
+      replaceNodes.forEach(
+        v => v.value += '!important'
+      )
+    }
+    // debugger
 
     if (replaceNodes) {
       let pos = container.indexOf(node);

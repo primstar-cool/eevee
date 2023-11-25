@@ -66,7 +66,9 @@ module.exports = function (node, cssDomain) {
     const bgNode = {
       tagName: "image",
       isAutoCreateBgNode: 1,
-      parentNode: node,
+      get parentNode () {
+        return node
+      },
       logic: {
         uuid: typeof node.logic.uuid === 'string' ? node.logic.uuid + "::bg" :
           (

@@ -114,18 +114,18 @@ class CssDomain {
     //                 }
     //             }
         
-    //             var isPesudo = false;
+    //             var isPseudo = false;
     //             var cssSituasion = cssObj.route;
     //             if (cssSituasion.length === 1) continue;
 
     //             cssSituasion = cssSituasion.slice(0, cssSituasion.length - 2);
     //             if (cssSituasion.length >= 3) {
     //                 if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
-    //                     isPesudo = true;
+    //                     isPseudo = true;
     //                 }
     //             }
 
-    //             if (this._fitClassRule(arrayRoute, cssSituasion, isPesudo)) {
+    //             if (this._fitClassRule(arrayRoute, cssSituasion, isPseudo)) {
     //                 destRules.push(cssObj)
     //             }
     //         }
@@ -150,15 +150,15 @@ class CssDomain {
                     }
                 }
         
-                var isPesudo = false;
+                // var isPseudo = false;
                 var cssSituasion = cssObj.route;
-                if (cssSituasion.length >= 3) {
-                    if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
-                        isPesudo = true;
-                    }
-                }
+                // if (cssSituasion.length >= 3) {
+                //     if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
+                //         isPseudo = true;
+                //     }
+                // }
 
-                if (this._fitClassRule(arrayRoute, cssSituasion, isPesudo)) {
+                if (this._fitClassRule(arrayRoute, cssSituasion)) {
                     destRules.push(cssObj)
                 }
             }
@@ -170,6 +170,8 @@ class CssDomain {
 
 
     computeStlyeIdByRouteKey(routeKey) {
+
+        // if (routeKey.includes("#aaa")) debugger
 
         var computeredClassMap = this.computeredClassMap;
         var cssRuleArray = this.cssRuleArray;
@@ -204,33 +206,70 @@ class CssDomain {
                     }
                 }
         
-                var isPesudo = false;
+                // var isPseudo = false;
                 var cssSituasion = cssObj.route;
-                if (cssSituasion.length >= 3) {
-                    if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
-                        isPesudo = true;
-                    }
-                }
+                // if (cssSituasion.length >= 3) {
+                //     if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
+                //         isPseudo = true;
+                //     }
+                // }
+                let lastRoute = cssSituasion[cssSituasion.length - 1];
 
-                if (this._fitClassRule(arrayRoute, cssSituasion, isPesudo)) {
+                if (lastRoute.pseudo && cssSituasion.length === 1) {
+                    console.log("ignore css:" + lastRoute.pseudo + JSON.stringify(cssObj.style) )                            
+                } else if (this._fitClassRule(arrayRoute, cssSituasion)) {
 
-                    if (isPesudo) {
-                        var rule = cssSituasion[cssSituasion.length - 1].tag
-                        if (rule === 'after' || rule === 'before') {
+                    // if (i === 47) debugger
+
+                    let isPseudo = 0;
+                    if (lastRoute.pseudo) {
+                        isPseudo++;
+                        let rule = lastRoute.pseudo;
+                        if (rule === '::after' || rule === '::before') {
                             if (!destStyle.pseudoElement) {
                                 destStyle.pseudoElement = {};
                             }
-                            destStyle.pseudoElement[rule] = cssObj.style;
+                            destStyle.pseudoElement[rule.substr(2)] = cssObj.style;
                         } else {
+                            ASSERT(rule[0] === ':' && (rule[1] !== ':' || cssSituasion.length === 1));
+
+                            if (cssSituasion.length === 1) {
+
+                            }
+
                             if (!destStyle.pseudo) {
                                 destStyle.pseudo = [];
                             }
-                            destStyle.pseudo.unshift({rule: rule, style: cssObj.style});
+                            destStyle.pseudo.unshift({rule: rule.substr(1), style: _mergeStyle({}, cssObj)});
                         }
-                        
+                    } 
 
-                    } else {
-                        Object.assign(destStyle, cssObj.style);
+                    // if (cssSituasion.find(v=>v.pseudo)) debugger
+
+                    for (let j = cssSituasion.length - 3; j >= 0; j--) {
+                        let sRoute = cssSituasion[j];
+
+                        if (sRoute.pseudo) {
+                            isPseudo++;
+                            let rule = sRoute.pseudo;
+                            ASSERT(rule[0] === ':' && rule[1] !== ':');
+
+                            if (!destStyle.pseudo) {
+                                destStyle.pseudo = [];
+                            }
+                            // debugger
+                            // console.log(i);
+                            destStyle.pseudo.unshift({rule: rule.substr(1), style: _mergeStyle({}, cssObj), depth: -(cssSituasion.length - 1 - j) / 2});
+
+                        }
+
+                    }
+
+
+                    if (!isPseudo) {
+
+                        _mergeStyle(destStyle, cssObj)
+
                     }
                     
                 }
@@ -280,8 +319,29 @@ class CssDomain {
         );
         return computeredClassMap.length - 1;
 
+        function _mergeStyle(destStyle, cssObj) {
+
+            Object.assign(destStyle, cssObj.style);
+
+            if (cssObj.important) {
+                debugger
+                if (!destStyle.__importantKeys) {
+                    destStyle.__imortantKeys = Object.keys(cssObj.style);
+                } else {
+                    let newKey = Object.keys(cssObj.style);
+                    destStyle.__imortantKeys = destStyle.__imortantKeys.concat(newKey.filter(k => !destStyle.__imortantKeys.includes(k)))
+                }
+            } else {
+                ASSERT(!destStyle.__importantKeys, "sort error");
+            }
+
+            return destStyle;
+        }
+
 
     }
+
+    
 
     computeNodeCssStyleHash(node) {
         var me = this;
@@ -357,11 +417,11 @@ class CssDomain {
 
 
     // 返回一个route 是否符合一个css条件
-    _fitClassRule(myRouteArray, cssSituasion, isPesudo) {
+    _fitClassRule(myRouteArray, cssSituasion) {
 
 
         var mi = myRouteArray.length - 1;
-        var ci = cssSituasion.length - (isPesudo ? 3 : 1);
+        var ci = cssSituasion.length - (1);
 
         
         

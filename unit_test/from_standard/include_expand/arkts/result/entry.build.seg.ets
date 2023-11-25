@@ -1,8 +1,8 @@
 Column() {
   Text("include test" /*entry-s1*/).fontColor(0xFF0000).fontSize("30px").fontWeight(FontWeight.Bold)
-  Flex(/*entry-s3*/) {
+  Flex({wrap: FlexWrap.Wrap} /*entry-s3*/) {
     /*<!--expand include from folder/include_lv0.wxml-->*/
-    if ((this.abc&&this.bcd)) {
+    if ((this.abc && this.bcd)) {
       Text("it is included wxml" /*entry-s5*/).fontColor(0xFF0000).fontSize("30px").fontWeight(FontWeight.Bold)
     }
     /*<!--expand include from folder/include_lv1.wxml-->*/

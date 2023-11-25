@@ -14,7 +14,17 @@ module.exports = (hapDesignWidth = 720) => {
       if (node.type === 'declaration') {
         if (node.value.indexOf('rpx') !== -1) {
           node.value = node.value.replace(/([\d\.]+)rpx/g, (m, r) => {
-            return Math.round(hapDesignWidth * 8192 * r / 750 ) / 8192 + 'lpx';  // fixed(2)
+
+            if (hapDesignWidth === 750) 
+              return r + 'lpx'
+            else {
+              if (hapDesignWidth === 720 && r <= 4) {
+                return r + "lpx"
+              } 
+
+              return Math.round(hapDesignWidth * 8192 * r / 750 ) / 8192 + 'lpx';  // fixed(2)
+              
+            }
           });
         }
       }

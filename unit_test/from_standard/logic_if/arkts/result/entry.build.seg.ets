@@ -1,5 +1,5 @@
 
-  Flex(/*entry-s1*/) {
+  Flex({wrap: FlexWrap.Wrap} /*entry-s1*/) {
     if (this.attr1) {
       Text("single if" /*entry-s2*/).backgroundColor(0xFF0000).height("100px").width("100px")
     }
@@ -31,4 +31,5 @@
       Text("else end" /*entry-s20*/).backgroundColor(0xFF0000).height("100px").width("100px")
     }
   }.backgroundColor(0x0000FF)
+  .width("100%"/*display block default*/)
 

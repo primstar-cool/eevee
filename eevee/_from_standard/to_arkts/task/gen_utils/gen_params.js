@@ -11,7 +11,7 @@ function ASSERT (flag, ...args) {
 }
 
 
-module.exports = function genParams(node, destClassTagName, functionArray, styleHolder, cssDomain, sourceType) {
+module.exports = function genParams(node, destClassTagName, functionArray, styleHolder, cssDomain, sourceType, {resolveAssetsPathFn}) {
       
   let uuid;
   
@@ -44,12 +44,23 @@ module.exports = function genParams(node, destClassTagName, functionArray, style
   if (destClassTagName === "Image") {
     if (node.attrs && node.attrs.src) {
       let v = node.attrs.src;
+      let imageUrl;
       if (typeof v === "object") {
-        let objString = getObjectDataExpression(v, functionArray);
-        return objString + " /*" + uuid + "*/";
+        
+
+        resolveAssetsPathFn
+        imageUrl = getObjectDataExpression(v, functionArray);
       } else {
-        return JSON.stringify(v) + " /*" + uuid + "*/";
+        imageUrl = JSON.stringify(v);
+
       }
+
+      if (resolveAssetsPathFn) {
+        imageUrl = resolveAssetsPathFn(imageUrl, node);
+      }
+
+      return imageUrl + " /*" + uuid + "*/";
+
     }
   } else if (destClassTagName === "Text") {
     // debugger
@@ -58,6 +69,39 @@ module.exports = function genParams(node, destClassTagName, functionArray, style
     }
     let dataString = genDataString(node.childNodes[0].data, functionArray);
     return dataString + " /*" + uuid + "*/";
+
+  } else if (destClassTagName === 'Flex') {
+    // debugger
+    let destParamStr = ''
+    if (node._isFlex) {
+      if (node.computedStyle.flexWrap) {
+        destParamStr += `wrap: FlexWrap.${node.computedStyle.flexWrap[0].toUpperCase() + node.computedStyle.flexWrap.substr(1)}, `
+      } else if (node.computedStyle.flexDirection) {
+        destParamStr += `direction: Direction.${node.computedStyle.flexDirection[0].toUpperCase() + node.computedStyle.flexDirection.substr(1)}, `
+      }
+      
+    } else {
+      destParamStr += `wrap: FlexWrap.Wrap, `;
+
+      let loopNode = node;
+        let _textAlign = loopNode.computedStyle.textAlign;
+        while (!_textAlign) {
+          loopNode = loopNode.parentNode;
+          if (!loopNode || !loopNode.computedStyle) break;
+            _textAlign = loopNode.computedStyle.textAlign;;
+        }
+        if (_textAlign === 'right' || _textAlign === 'end') {
+          destParamStr += ('justifyContent: FlexAlign.End')
+          // debugger
+        } else if (_textAlign === 'center') {
+          destParamStr += ('justifyContent: FlexAlign.Center')
+        }
+    }
+
+    if (destParamStr) {
+      destParamStr = ("{"+ destParamStr + "}").replace(", }", "}")
+    }
+    return destParamStr + " /*" + uuid + "*/";
 
   }
 

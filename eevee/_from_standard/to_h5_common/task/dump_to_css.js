@@ -5,7 +5,7 @@ function ASSERT (flag, ...args) {
     }
 }
 
-const defualtGetImportedStyleContent = require('../../helpers/get_imported_style_content.js');
+const defaultGetImportedStyleContent = require('../../helpers/get_imported_style_content.js');
 
 module.exports = function dumpCssNode(
     root,
@@ -30,18 +30,31 @@ module.exports = function dumpCssNode(
       n=> {
           if (n.convertedStyle) return;
 
-          processorCssObj(n.styleContent, n.src, n.sourceType, "BROWSER", getImportedStyleContentFn || defualtGetImportedStyleContent(styleNodes, rootSrcPath));
+          processorCssObj(n.styleContent, n.src, n.sourceType, "BROWSER", getImportedStyleContentFn || defaultGetImportedStyleContent(styleNodes, rootSrcPath));
           
           n.convertedStyle = exporterCss(n.styleContent, minifyCss);
       }
     )
 
+    let allRules = styleNodes.map(v=>v.styleContent.stylesheet.rules).flat();
+    let ruleDict = {};
+    let allRulesUnDup = [];
+
+    allRules.forEach(
+      v => {
+        let key = JSON.stringify(v);
+        if (!ruleDict[key]) {
+          ruleDict[key] = 1;
+          allRulesUnDup.push(v);
+        }
+      }
+    )
 
     // debugger
 
     let cssMerged;
     if (styleNodes[0]) {
-        cssMerged = styleNodes[0].convertedStyle;
+        cssMerged = styleNodes.map(v=>v.convertedStyle).join("\n\n");
 
         let styleString = `${
             cssMerged.includes("rem;") ? "html{-webkit-text-size-adjust:none;font-size:13.33333vw ": ""

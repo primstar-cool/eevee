@@ -31,6 +31,9 @@ module.exports = function genNodeCssXPathName(node, functionArray, styleHolder, 
   let parentNode = node.parentNode;
   if (parentNode) {
 
+    let isPseudoElement = node.style._classStyleHash.xPath && node.style._classStyleHash.xPath.startsWith("::");
+    let NEXT_FLAG = isPseudoElement ? "" : ">"
+
     if (!node.isAutoCreateTextNode
       && !node.isAutoCreateBgNode
       && !node.isAutoCreateBorderNode
@@ -41,7 +44,7 @@ module.exports = function genNodeCssXPathName(node, functionArray, styleHolder, 
       ) {
         node.style._classStyleRouteFull = {
           isStatic: true,
-          xPath: parentNode.style._classStyleRouteFull.xPath + ">" + node.style._classStyleHash.xPath
+          xPath: parentNode.style._classStyleRouteFull.xPath + NEXT_FLAG + node.style._classStyleHash.xPath
         }
       } else {
 
@@ -62,10 +65,10 @@ module.exports = function genNodeCssXPathName(node, functionArray, styleHolder, 
           
           node.style._classStyleRouteFull = {
             isStatic: false,
-            xPathFunc: JSON.stringify(parentNode.style._classStyleRouteFull.xPath + ">" + node.style._classStyleHash.xPathObject.left.value) + " " +  myFuncRight,
+            xPathFunc: JSON.stringify(parentNode.style._classStyleRouteFull.xPath + NEXT_FLAG + node.style._classStyleHash.xPathObject.left.value) + " " +  myFuncRight,
             xPathObject: new javascript.astFactory.BinaryExpression(
               '+',
-              new javascript.astFactory.Literal(parentNode.style._classStyleRouteFull.xPath + ">" + node.style._classStyleHash.xPathObject.left.value),
+              new javascript.astFactory.Literal(parentNode.style._classStyleRouteFull.xPath + NEXT_FLAG + node.style._classStyleHash.xPathObject.left.value),
               node.style._classStyleHash.xPathObject.right,
             )
           }
@@ -86,32 +89,32 @@ module.exports = function genNodeCssXPathName(node, functionArray, styleHolder, 
           
           node.style._classStyleRouteFull = {
             isStatic: false,
-            xPathFunc: parentFuncLeft + " " + JSON.stringify(parentNode.style._classStyleHash.xPathObject.right.value + ">" +node.style._classStyleHash.xPath),
+            xPathFunc: parentFuncLeft + " " + JSON.stringify(parentNode.style._classStyleHash.xPathObject.right.value + NEXT_FLAG + node.style._classStyleHash.xPath),
             xPathObject: new javascript.astFactory.BinaryExpression(
               '+',
               parentNode.style._classStyleHash.xPathObject.left,
-              new javascript.astFactory.Literal(parentNode.style._classStyleHash.xPathObject.right.value + ">" + node.style._classStyleHash.xPath),
+              new javascript.astFactory.Literal(parentNode.style._classStyleHash.xPathObject.right.value + NEXT_FLAG + node.style._classStyleHash.xPath),
             )
           }
 
         } else {
 
-          let parentNodeXPathStr = (parentNode.style._classStyleRouteFull.isStatic ? JSON.stringify(parentNode.style._classStyleRouteFull.xPath + ">") : `(${parentNode.style._classStyleRouteFull.xPathFunc})`)
-          let parentNodeXPathObject = parentNode.style._classStyleRouteFull.isStatic ? new javascript.astFactory.Literal(parentNode.style._classStyleRouteFull.xPath+">") : parentNode.style._classStyleRouteFull.xPathObject;
+          let parentNodeXPathStr = (parentNode.style._classStyleRouteFull.isStatic ? JSON.stringify(parentNode.style._classStyleRouteFull.xPath + NEXT_FLAG) : `(${parentNode.style._classStyleRouteFull.xPathFunc})`)
+          let parentNodeXPathObject = parentNode.style._classStyleRouteFull.isStatic ? new javascript.astFactory.Literal(parentNode.style._classStyleRouteFull.xPath + NEXT_FLAG) : parentNode.style._classStyleRouteFull.xPathObject;
   
           ASSERT(parentNodeXPathObject);
   
-          let myNodeXPathStr = (node.style._classStyleHash.isStatic ? JSON.stringify(">" + node.style._classStyleHash.xPath) : `(${node.style._classStyleHash.xPathFunc})`)
-          let myNodeXPathObject = node.style._classStyleHash.isStatic ? new javascript.astFactory.Literal(">" + node.style._classStyleHash.xPath) : node.style._classStyleHash.xPathObject;
+          let myNodeXPathStr = (node.style._classStyleHash.isStatic ? JSON.stringify(NEXT_FLAG + node.style._classStyleHash.xPath) : `(${node.style._classStyleHash.xPathFunc})`)
+          let myNodeXPathObject = node.style._classStyleHash.isStatic ? new javascript.astFactory.Literal(NEXT_FLAG + node.style._classStyleHash.xPath) : node.style._classStyleHash.xPathObject;
   
           let isAllUnStatic = (!parentNode.style._classStyleRouteFull.isStatic && !node.style._classStyleHash.isStatic);
   
           node.style._classStyleRouteFull = {
             isStatic: false,
-            xPathFunc: parentNodeXPathStr + " + " + (isAllUnStatic ? `">" + ` : '') + myNodeXPathStr,
+            xPathFunc: parentNodeXPathStr + " + " + ((isAllUnStatic&&!isPseudoElement) ? `">" + ` : '') + myNodeXPathStr,
             xPathObject: new javascript.astFactory.BinaryExpression(
               '+',
-              isAllUnStatic ? 
+              (isAllUnStatic&&!isPseudoElement) ? 
                 new javascript.astFactory.BinaryExpression('+', new javascript.astFactory.Literal(">"), parentNodeXPathObject)
                 : parentNodeXPathObject
               ,
@@ -183,7 +186,7 @@ function genNodeCssName(node, functionArray, addExtraClassTagName) {
   }
 
 
-  if (node.attrs.id) {
+  if (node.attrs && node.attrs.id) {
     // debugger
     if (typeof node.attrs.id === 'string') {
       _idString += '#' + node.attrs.id;

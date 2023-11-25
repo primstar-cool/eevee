@@ -1,4 +1,5 @@
-const defualtGetImportedStyleContent = require('../helpers/get_imported_style_content.js');
+const defaultGetImportedStyleContent = 
+require('../helpers/get_imported_style_content.js');
 
 function ASSERT (flag, ...args) {
   if (!flag) {
@@ -66,6 +67,42 @@ module.exports = function (node,
 
   const processorCssObj = require("../../processor/processor_css_obj/convertor/index.js");
   let styleNodes =  node.childNodes.filter(v=>v.tagName === 'style');
+
+  styleNodes.unshift(
+    {
+      tagName: 'style',
+      styleContent: {
+        type: 'stylesheet',
+        stylesheet: {
+          rules: [
+            {
+              type: 'rule',
+              selectors: ["input"],
+              declarations: [
+                {
+                  property: 'border-radius',
+                  type:'declaration',
+                  value: '0',
+                },
+                {
+                  property: 'padding',
+                  type:'declaration',
+                  value: '0',
+                },
+                {
+                  property: 'background-color',
+                  type:'declaration',
+                  value: 'transparent',
+                }
+              ]
+            }
+          ]
+        }
+      }
+
+    }
+  )
+
   let sourceType = node.sourceType;
   let extraPlugin;
   if (sourceType === "wxmp" || sourceType === "ttma" || sourceType === "ksmp" || sourceType === "swan") {
@@ -79,15 +116,21 @@ module.exports = function (node,
       require("../../processor/processor_css_obj/convertor/plugins/vw_to_lpx.js")(config.hapDesignWidth),
       require("../../processor/processor_css_obj/convertor/plugins_extra/background_longhand.js")(),
       require("../../processor/processor_css_obj/convertor/plugins_extra/border_radius_normalize.js")(),
+      require("../../processor/processor_css_obj/convertor/plugins_extra/border_longhand.js")(),
       require("../../processor/processor_css_obj/convertor/plugins_extra/background_image_normalize.js")(),
-      require("../../processor/processor_css_obj/convertor/plugins_extra/color_normalize.js")("RGBA"),
+      require("../../processor/processor_css_obj/convertor/plugins_extra/color_normalize.js")("ARGB"),
+      require("../../processor/processor_css_obj/convertor/plugins_extra/padding_longhand.js")(),
+      require("../../processor/processor_css_obj/convertor/plugins_extra/margin_longhand.js")(),
+      require("../../processor/processor_css_obj/convertor/plugins_extra/overflow_longhand.js")(),
+
     ]
   );
+
 
   styleNodes.forEach(
     n=> {
         // if (n.convertedStyle) return;
-        processorCssObj(n.styleContent, n.src, n.sourceType, config.env || "HARMONY", config.getImportedStyleContentFn || defualtGetImportedStyleContent(styleNodes, rootSrcPath), {inlineImport: true}, extraPlugin);
+        processorCssObj(n.styleContent, n.src, n.sourceType, config.env || "HARMONY", config.getImportedStyleContentFn || defaultGetImportedStyleContent(styleNodes, rootSrcPath), {inlineImport: true, splitImportant: true}, extraPlugin);
     }
   );
   // debugger
@@ -98,7 +141,30 @@ module.exports = function (node,
   if (styleNodes[0]) {
     const CssDomain = require("../../processor/processor_css_obj/css_domain/css_domain.js");
     const sortCssRules  = require("../../processor/processor_css_obj/css_domain/sort_css_rules.js");
-    sortedCssRules = sortCssRules(styleNodes[0].styleContent);
+
+    let allRules = styleNodes.map(v=>v.styleContent.stylesheet.rules).flat();
+    let ruleDict = {};
+    let allRulesUnDup = [];
+
+    allRules.forEach(
+      v => {
+        let key = JSON.stringify(v);
+        if (!ruleDict[key]) {
+          ruleDict[key] = 1;
+          allRulesUnDup.push(v);
+        }
+      }
+    )
+
+
+    sortedCssRules = sortCssRules(
+      {
+        type: "stylesheet",
+        stylesheet: {
+          rules: allRulesUnDup
+        }
+      }
+    );
     cssDomain = new CssDomain({css: sortedCssRules});
   }
 
@@ -112,7 +178,7 @@ module.exports = function (node,
       mainClassName,
       cssDomain,
       getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
-      resolveAssetsPathFn: undefined,
+      resolveAssetsPathFn: config.resolveAssetsPathFn,
       enableIterObject: config.enableIterObject
     }
   );

@@ -52,7 +52,7 @@ module.exports = function (
           tagName: "style",
           sourceType: key.substring(key.lastIndexOf(".") + 1),
           styleContent: cssParse(allImportNodes[key]),
-          src: path.relative(rootSrcPath, key)
+          src: path.relative(rootSrcPath, key).replace(/\\/g, "/")
         }
         resultNodes.push(ret)
         processd[key] = 1;

@@ -322,6 +322,7 @@ function resolveLogicIfByKey(node, attrName, type) {
 function tryResolveLogicEnvIf(node) {
 
   if (node.attrs && node.attrs["env-if"]) {
+    
     if (!node.logic) node.logic = {};
 
     node.logic["env-if"] =  node.attrs['env-if'];

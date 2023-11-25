@@ -7,7 +7,7 @@ function ASSERT (flag, ...args) {
       throw new Error(...args);
   }
 }
-module.exports = function genForFunction(node, forFuncObjArr, forFuncIndex, genSubNodeString, { sourceType, functionArray, ifReferArr, depth, inlineThreshold = 50, styleHolder = undefined, cssDomain = undefined, polyFillForIndex = undefined, extraConfig = undefined, enableIterObject = undefined }) {
+module.exports = function genForFunction(node, forFuncObjArr, forFuncIndex, genSubNodeString, { sourceType, functionArray, ifReferArr, depth, inlineThreshold = 50, styleHolder = undefined, cssDomain = undefined, polyFillForIndex = undefined, extraConfig = undefined, enableIterObject = undefined, fns = {} }) {
 
   // inlineThreshold = 1;
 
@@ -120,7 +120,7 @@ module.exports = function genForFunction(node, forFuncObjArr, forFuncIndex, genS
   forFuncObjArr[forFuncIndex] = {
     content: replaceContextToParam(`
 @Builder _for_map_fn_${forFuncIndex}${funcParamsTypeString} {
-${genIndent(2)}/*return*/ ${subIf ? `if (${subIf}) {` : ""}\n${genIndent(subIf ? 3 : 2)}${genSubNodeString(node, Object.assign({ sourceType, functionArray, ifReferArr, forFuncObjArr, depth: subIf ? 3 : 2, styleHolder, ignoreMyNodeLogic: true, cssDomain, enableIterObject }, extraConfig || {})).trim()}${subIf ? `\n${genIndent(2)}}` : ``}
+${genIndent(2)}/*return*/ ${subIf ? `if (${subIf}) {` : ""}\n${genIndent(subIf ? 3 : 2)}${genSubNodeString(node, Object.assign({ sourceType, functionArray, ifReferArr, forFuncObjArr, depth: subIf ? 3 : 2, styleHolder, ignoreMyNodeLogic: true, cssDomain, enableIterObject, fns }, extraConfig || {})).trim()}${subIf ? `\n${genIndent(2)}}` : ``}
 /*ends of _for_map_fn_${forFuncIndex}*/
 }`, forItemParsed, forIndexParsed), forFuncIndex, forDepth: myForDepth, forItem, forIndex
   };

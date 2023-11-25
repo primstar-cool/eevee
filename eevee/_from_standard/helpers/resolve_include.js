@@ -144,7 +144,7 @@ function resolveInclude(
 
           ASSERT(rootSrcPath, srcFilePath)
           let commentNode = {
-            data: `<!--expand include from ${path.relative(rootSrcPath, path.join(path.dirname('./' + srcFilePath), src))}-->`
+            data: `<!--expand include from ${path.relative(rootSrcPath, path.join(path.dirname('./' + srcFilePath), src)).replace(/\\/g, "/")}-->`
           };
           replaceNode(node, [commentNode].concat(includedRoot.childNodes));
           i += includedRoot.childNodes.length;

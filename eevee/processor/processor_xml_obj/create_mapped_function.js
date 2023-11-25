@@ -13,12 +13,16 @@ createMappedFunction.createFunctionStr = (ast) => {
         return `\t\t/*0*/\n\t\t/*${JSON.stringify(ast)}*/\n\t\tfunction (_cONTEXT) {\n\t\t\treturn (_cONTEXT.${ast.name});\n\t\t}`
     }
 
-    
-
     let nodeWrapper = {data: ast};
     var {functionArray} = createMappedFunction(nodeWrapper, false, false, false);
     ASSERT(functionArray.length === 1);
     return functionArray[0];
+}
+
+createMappedFunction.createFunctionReturnStr = (ast) => {
+
+    let funStr = createMappedFunction.createFunctionStr(ast);
+    return funStr.substring(funStr.indexOf("return") + 6, funStr.lastIndexOf(";")).trim();
 }
 
 function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, targetEnv) {
@@ -241,7 +245,7 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
         } else if (obj.type === "UnaryExpression") {
             ret = obj.operator + createAObjFunctionStr(obj.argument, _referKeys);
         } else if (obj.type === "LogicalExpression") {
-            ret = "(" + createAObjFunctionStr(obj.left, _referKeys) + obj.operator + createAObjFunctionStr(obj.right, _referKeys) + ")"
+            ret = "(" + createAObjFunctionStr(obj.left, _referKeys) + " " + obj.operator + " " + createAObjFunctionStr(obj.right, _referKeys) + ")"
         } else if ( obj.type === "ArrayExpression") {
             // debugger
             ret = "[" + obj.elements.map(v => createAObjFunctionStr(v, _referKeys)).join(",") + "]"

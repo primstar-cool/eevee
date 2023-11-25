@@ -15,6 +15,9 @@ module.exports = function genAllPossibleStyle(standardNode, cssDomain, removeRoo
         for (let key in collectRoute) {
             let fakeNode = Object.assign({}, collectRoute[key], {childNodes: null});
             // debugger
+
+            // if (key.includes("#bottom-info")) debugger
+
             fakeNode.style = Object.assign({}, fakeNode.style, {_classStyleRouteFull: key});
 
             let cssData = cssDomain.getNodeCssStyle(fakeNode);

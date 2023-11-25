@@ -73,10 +73,10 @@ module.exports = () => {
    */
   function createLonghandPadding(top, right, bottom, left, parent) {
     return [
-      createDeclaration('paddingTop', top, parent),
-      createDeclaration('paddingRight', right, parent),
-      createDeclaration('paddingBottom', bottom, parent),
-      createDeclaration('paddingLeft', left, parent),
+      createDeclaration('padding-top', top, parent),
+      createDeclaration('padding-right', right, parent),
+      createDeclaration('padding-bottom', bottom, parent),
+      createDeclaration('padding-left', left, parent),
     ];
   }
   return plugin;

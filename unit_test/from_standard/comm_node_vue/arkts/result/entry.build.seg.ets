@@ -1,5 +1,5 @@
 
-  Flex(/*entry-s1*/) {
+  Flex({wrap: FlexWrap.Wrap} /*entry-s1*/) {
     Text("normarl text" /*entry-s2*/)
     /*<!-- single line comment-->*/
     Text(this.dynText /*entry-s5*/)
@@ -15,4 +15,5 @@
     .height("100px")
     .width("100px")
   }.backgroundColor(0x0000FF)
+  .width("100%"/*display block default*/)
 

@@ -73,6 +73,7 @@ module.exports = function wxml2standard(root, filePath, rootSrcPath) {
     }
     tryResolveLogicFor(node);
     tryResolveLogicIf(node);
+    tryResolveLogicEnvIf(node);
 
     if (node.data) {
       let attrValue = node.data;
@@ -201,6 +202,19 @@ function tryResolveLogicFor(node) {
     node.logic.key = keyVar;
   }
 }
+
+function tryResolveLogicEnvIf(node) {
+
+  if (node.attrs && node.attrs['env-if']) {
+    if (!node.logic) {node.logic = {};}
+    let t = node.attrs['env-if'];
+    if (t.startsWith("{{") && t.endsWith("}}")) {
+      t = t.slice(2, -2);
+    }
+    node.logic['env-if'] = t;
+  }
+}
+
 
 function tryResolveLogicIf(node) {
   if (!node.logic) {node.logic = {};}

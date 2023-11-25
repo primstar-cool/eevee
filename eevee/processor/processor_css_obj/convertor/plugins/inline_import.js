@@ -16,7 +16,7 @@ function inline_import(contentObject, filePath, findImportFn, targetEnv) {
                     inline_import(importedStyle.styleContent, importedStyle.filePath, importedStyle.findImportFn || findImportFn);
 
                     r.type = 'comment';
-                    r.comment = "expand import content from " + r.import + ' by ' + JSON.stringify(filePath);
+                    r.comment = "expand import content from " + r.import + ' by ' + JSON.stringify(filePath.replace(/\\/g, "/"));
 
                     rules.splice(
                         i+1, 0, ...importedStyle.styleContent.stylesheet.rules

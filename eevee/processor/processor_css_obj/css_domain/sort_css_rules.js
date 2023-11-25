@@ -9,12 +9,52 @@ module.exports = function sort_css_rules(styleContent) {
         _resolveRules(rules, destArray);
     }
 
+    let importStyle = [];
+    destArray.forEach(
+        co => {
+            if (co.style) {
+                let styleImportant;
+
+                let keys = Object.keys(co.style);
+                let importantKeys = (keys.filter(key => co.style[key].includes("!important")));
+                // if (importantKeys.length) debugger
+                if (importantKeys.length === 0) return;
+
+                if (importantKeys.length === keys.length) {
+                    co.important = true;
+                    return;
+                }
+
+                styleImportant = {};
+                debugger
+                importantKeys.forEach(
+                    key => {
+                        
+                        let value = co.style[key];
+                        delete co.style[key];
+                        styleImportant[key] = value;
+      
+                    }
+                );
+
+                importStyle.push(
+                    Object.assign({}, co, {style: styleImportant, important: true})
+                )
+                // debugger
+            }
+        }
+
+    )
+    destArray = destArray.concat(importStyle);
+
+
     destArray.forEach(
         co => {
             var w = 0;
 
             co.route.forEach(
                 cor => {
+                    if (co.important) w += 1000000000000;
                     if (cor.id) w += 1000000000;
                     if (cor.classList) w += 1000000 * cor.classList.length;
                     if (cor.tag) w += 1000;
@@ -58,14 +98,33 @@ module.exports = function sort_css_rules(styleContent) {
                                 style[d.property] = d.value;
                         }
                     )
+                    // console.log(rule.selectors)
+
+
+                    if (!Object.keys(style).length) return;
+
                     rule.selectors.forEach(
                         s => {
 
                             s = s.trim();
-                            var dumpReg = /[#\.0-9a-zA-Z_\-]+/g;
+                            var dumpReg = /[#\.0-9a-zA-Z_\(\)\-]+/g;
                             var rArray = [];
                             var result;
                             var lastIndex = -1;
+
+                            if (s.startsWith(":")) {
+                                destArray.push(
+                                {
+                                    route: [
+                                        {
+                                            pseudo: s
+                                        }
+                                    ],
+                                    style,
+                                    index: destArray.length
+                                });
+                                return;
+                            }
 
                             while ((result = dumpReg.exec(s))) {
                                 if (lastIndex !== -1) {
@@ -74,24 +133,27 @@ module.exports = function sort_css_rules(styleContent) {
                                     if (spliter === '') {
                                         spliter = ' ';
                                     }
-
-                                    rArray.push(spliter);
-
+                                    
+                                    if (spliter[0] !== ':')
+                                        rArray.push(spliter);
                                 }
 
-                                rArray.push(_analysisCssHash(result[0]));
+                                if (!spliter || spliter[0] !== ':') {
+                                    rArray.push(_analysisCssHash(result[0]));
+                                } else {
+                                    rArray[rArray.length - 1].pseudo = spliter + result[0];
+                                }
                                 lastIndex = result.index + result[0].length;
                             }
 
-                            if (Object.keys(style).length) {
-                                destArray.push(
-                                    {
-                                        route: rArray,
-                                        style,
-                                        index: destArray.length
-                                    });
-                            }
-                            return;
+                            destArray.push(
+                            {
+                                route: rArray,
+                                style,
+                                index: destArray.length
+                            });
+                            // if (rule.selectors.join("").includes(":")) debugger
+
                         }
                     )
                 }

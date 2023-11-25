@@ -2,7 +2,7 @@
   <Text className="tag-text" /*uuid="entry-s1"*/ >include test</Text>,
   <View className="tag-view" /*uuid="entry-s3"*/ >
     {/*<!--expand include from folder/include_lv0.wxml-->*/}
-    {(/*_if_0 = */(_cONTEXT.abc&&_cONTEXT.bcd)) && <Text className="tag-text" /*uuid="entry-s5"*/ >it is included wxml</Text>}
+    {(/*_if_0 = */(_cONTEXT.abc && _cONTEXT.bcd)) && <Text className="tag-text" /*uuid="entry-s5"*/ >it is included wxml</Text>}
     {/*<!--expand include from folder/include_lv1.wxml-->*/}
     {(/*_if_1 = */_cONTEXT.abc) && <Text className="tag-text" /*uuid="entry-s8"*/ >it is included wxml in a sub wxml</Text>}
     {/*<!--expand include from folder/include_abs.wxml-->*/}

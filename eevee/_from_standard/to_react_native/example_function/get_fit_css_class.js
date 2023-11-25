@@ -15,15 +15,15 @@ module.exports = `function getFitCssClass(routeKey: string): string {
             //     }
             // }
 
-            var isPesudo = false;
+            var isPseudo = false;
             var cssSituasion = cssObj.route;
-            if (cssSituasion.length >= 3) {
-                if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
-                    isPesudo = true;
-                }
-            }
+            // if (cssSituasion.length >= 3) {
+            //     if (cssSituasion[cssSituasion.length - 2].charCodeAt(0) === 58) { //':'.charCodeAt(0)
+            //         isPseudo = true;
+            //     }
+            // }
 
-            if (_fitClassRule(arrayRoute, cssSituasion, isPesudo)) {
+            if (_fitClassRule(arrayRoute, cssSituasion)) {
                 destRules.push(cssObj.className)
             }
         }
@@ -69,11 +69,11 @@ function _analysisCssHash(cssHash: string): any {
 }
 
 // 返回一个route 是否符合一个css条件
-function _fitClassRule(myRouteArray: any[], cssSituasion: any[], isPesudo: boolean) {
+function _fitClassRule(myRouteArray: any[], cssSituasion: any[]) {
 
 
     var mi = myRouteArray.length - 1;
-    var ci = cssSituasion.length - (isPesudo ? 3 : 1);
+    var ci = cssSituasion.length - 1;
 
 
 

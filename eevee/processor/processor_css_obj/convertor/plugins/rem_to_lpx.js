@@ -14,6 +14,10 @@ module.exports = (screenWidthRem = 7.5, hapDesignWidth = 720) => {
       if (node.type === 'declaration') {
         if (node.value.indexOf('rem') !== -1) {
           node.value = node.value.replace(/([\d\.]+)rem/g, (m, r) => {
+
+            if (hapDesignWidth/screenWidthRem === Math.floor(hapDesignWidth/screenWidthRem)) 
+              return r * (hapDesignWidth/screenWidthRem) + 'lpx'
+
             return Math.round(hapDesignWidth * 8192 * r / screenWidthRem) / 8192 + 'lpx';
           });
         }

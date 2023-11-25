@@ -73,10 +73,10 @@ module.exports = () => {
    */
   function createLonghandMargin(top, right, bottom, left, parent) {
     return [
-      createDeclaration('marginTop', top, parent),
-      createDeclaration('marginRight', right, parent),
-      createDeclaration('marginBottom', bottom, parent),
-      createDeclaration('marginLeft', left, parent),
+      createDeclaration('margin-top', top, parent),
+      createDeclaration('margin-right', right, parent),
+      createDeclaration('margin-bottom', bottom, parent),
+      createDeclaration('margin-left', left, parent),
     ];
   }
   return plugin;

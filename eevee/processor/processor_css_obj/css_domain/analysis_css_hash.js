@@ -5,21 +5,36 @@ function ASSERT (flag, ...args) {
     }
   }
 module.exports = function _analysisCssHash(cssHash) {
-    //必须cssHash tag.class1.class2#id
+    //必须cssHash tag#id.class1.class2 或 tag.class1.class2#id
+        
+
     // console.ASSERT(cssHash.charAt(0) === '@' , "hash should normalized by getNodeStyleHash");
 
-    var hashIdx = cssHash.indexOf('#');
-    if (hashIdx !== -1) {
-        var id = cssHash.substring(hashIdx + 1);
-        cssHash = cssHash.substring(0, hashIdx);
-    } 
-
-    var dotIdx = cssHash.indexOf('.');
-    if (dotIdx !== -1) {
-        var tag = cssHash.substring(0, dotIdx);
-        var classList = cssHash.substring(dotIdx+ 1).split(".");
+    var hashIdxPlus1 = cssHash.indexOf('#') + 1;
+    var dotIdxPlus1 = cssHash.indexOf('.') + 1;
+    var classList, id, tag;
+    
+    if (!hashIdxPlus1 && !dotIdxPlus1) { // tag
+        tag = cssHash;
     } else {
-        tag = cssHash;//.substring(1);
+        if (!hashIdxPlus1) { // tag.class1.class2
+            classList = cssHash.substring(dotIdxPlus1).split(".");
+            tag = cssHash.substring(0, dotIdxPlus1 - 1);
+        } else if (!dotIdxPlus1) { // tag#id
+            id = cssHash.substring(hashIdxPlus1);
+            tag = cssHash.substring(0, hashIdxPlus1 - 1);
+
+        } else {
+            if (hashIdxPlus1 < dotIdxPlus1) { // tag#id.class1.class2
+                id = cssHash.substring(hashIdxPlus1, dotIdxPlus1-1);
+                classList = cssHash.substring(dotIdxPlus1).split(".");
+                tag = cssHash.substring(0, hashIdxPlus1 - 1);
+            } else { // tag.class1.class2#id
+                id = cssHash.substring(hashIdxPlus1);
+                classList = cssHash.substring(dotIdxPlus1, hashIdxPlus1-1).split(".");
+                tag = cssHash.substring(0, dotIdxPlus1 - 1);
+            }
+        }
     }
 
 

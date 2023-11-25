@@ -52,10 +52,10 @@ module.exports = () => {
           break;
       }
     } else {
-      // 两个值时取较大的值
+      // x!-y时 两个值时取较大的值
       let destVal = (vals.length === 1 ? vals[0] : (vals[0] < vals[1] ? vals[1] : vals[0]));
       replaceNodes = [
-        createDeclaration(node.property.replace(/-(\w)/g, (s, s1) => s1.toUpperCase()), destVal, parent),
+        createDeclaration(node.property, destVal, node.parent),
       ];
     }
     
@@ -100,10 +100,10 @@ module.exports = () => {
    */
   function createLonghandRadius(topLeft, topRight, bottomRight, bottomLeft, parent) {
     return [
-      createDeclaration('borderTopLeftRadius', topLeft, parent),
-      createDeclaration('borderTopRightRadius', topRight, parent),
-      createDeclaration('borderBottomRightRadius', bottomRight, parent),
-      createDeclaration('borderBottomLeftRadius', bottomLeft, parent)
+      createDeclaration('border-top-left-radius', topLeft, parent),
+      createDeclaration('border-top-right-radius', topRight, parent),
+      createDeclaration('border-bottom-right-radius', bottomRight, parent),
+      createDeclaration('border-bottom-left-radius', bottomLeft, parent)
     ];
   }
   return plugin;

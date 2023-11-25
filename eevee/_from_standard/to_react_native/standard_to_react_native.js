@@ -1,4 +1,4 @@
-const defualtGetImportedStyleContent = require('../helpers/get_imported_style_content.js');
+const defaultGetImportedStyleContent = require('../helpers/get_imported_style_content.js');
 
 function ASSERT (flag, ...args) {
   if (!flag) {
@@ -85,7 +85,7 @@ module.exports = function (node,
   styleNodes.forEach(
     n=> {
         // if (n.convertedStyle) return;
-        processorCssObj(n.styleContent, n.src, n.sourceType, "RN", config.getImportedStyleContentFn || defualtGetImportedStyleContent(styleNodes, rootSrcPath), {inlineImport: true}, extraPlugin);
+        processorCssObj(n.styleContent, n.src, n.sourceType, "RN", config.getImportedStyleContentFn || defaultGetImportedStyleContent(styleNodes, rootSrcPath), {inlineImport: true}, extraPlugin);
     }
   );
   // debugger
@@ -96,7 +96,29 @@ module.exports = function (node,
   if (styleNodes[0]) {
     const CssDomain = require("../../processor/processor_css_obj/css_domain/css_domain.js");
     const sortCssRules  = require("../../processor/processor_css_obj/css_domain/sort_css_rules.js");
-    sortedCssRules = sortCssRules(styleNodes[0].styleContent);
+
+    let allRules = styleNodes.map(v=>v.styleContent.stylesheet.rules).flat();
+    let ruleDict = {};
+    let allRulesUnDup = [];
+
+    allRules.forEach(
+      v => {
+        let key = JSON.stringify(v);
+        if (!ruleDict[key]) {
+          ruleDict[key] = 1;
+          allRulesUnDup.push(v);
+        }
+      }
+    )
+
+    sortedCssRules = sortCssRules(
+      {
+        type: "stylesheet",
+        stylesheet: {
+          rules: allRulesUnDup
+        }
+      }
+    );
     cssDomain = new CssDomain({css: sortedCssRules});
   }
 
