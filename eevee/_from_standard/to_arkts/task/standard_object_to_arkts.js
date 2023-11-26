@@ -445,6 +445,9 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           }
 
           if (numInline === node.childNodes.length) {
+
+            
+
             if (numInline <= 3 && !hasFor) {
               destClassTagName = 'Row';
             } 

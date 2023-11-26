@@ -2151,6 +2151,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     }
   }
 
+  // nerver use physics
   function plusPixel(l, r) {
 
     if (l == 0) return r;
@@ -2159,22 +2160,20 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (l.endsWith("lpx")) {
       if (r.endsWith("lpx"))
         return parseFloat(l) + parseFloat(r) + "lpx"
-      else if (r.endsWith("px"))
-        return parseFloat(l) + ` + px2lpx(${r.slice(0, -2)})` + ` + "lpx"`
+      else if (r.endsWith("vp") || r.endsWith("px"))
+        return parseFloat(l) + ` + vp2px(px2lpx(${r.slice(0, -2)}))` + ` + "lpx"`
       else 
         ASSERT(false, 'not support plus pixel with differnt unit')
-
-    } else if (l.endsWith("px")) {
+    } else if (l.endsWith("vp") || l.endsWith("px")) {
       if (r.endsWith("lpx"))
-        return parseFloat(l) + ` + lpx2px(${r.slice(0, -3)})` + ` + "px"`
-      else if (r.endsWith("px"))
-        return parseFloat(l) + parseFloat(r) + "px"
+        return parseFloat(l) + ` + lpx2px(px2vp(${r.slice(0, -3)}))` + ` + "vp"`
+      else if (r.endsWith("vp") ||r.endsWith("px"))
+        return parseFloat(l) + parseFloat(r) + "vp"
       else 
-        ASSERT(false, 'not support plus pixel with differnt unit')
-
-    } 
+        ASSERT(false, 'not support plus pixel with differnt unit');
+    }
     else {
-      ASSERT(false, 'not support plus pixel with differnt unit')
+      ASSERT(false, 'not support plus pixel with differnt unit');
     }
     debugger
   }
@@ -2282,9 +2281,13 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         v = 0;
       else 
         v = `${v} * SCREEN_HEIGHT`;
+    } else if (v.endsWith("lpx")) {
+      v = `"${v}"`
+    } else if (v.endsWith("px")) {
+      v = `"${v.slice(0, -2)}vp"`
     } else {
       v = `"${v}"`
     }
-    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`px"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`SCREEN_HEIGHT`));
+    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`vp"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`SCREEN_HEIGHT`));
     return v
   }
