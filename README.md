@@ -1,10 +1,11 @@
 # eevee
+一个工具集致力提供鸿蒙arkts/vue/react/rn/各类小程序/快应用的UI代码的互转;
 a toolkit focus on mutual convert UI code of arkts(harmony)/vue/react/react native/mini programe(wx,tt,baidu,ks)/hap;
 
-一个工具集致力提供鸿蒙arkts/vue/react/rn/各类小程序/快应用的UI代码的互转;
+
 
 # how to use / 怎么使用
-see unit_test，convert a source code to eevee-standard-json, and convert eevee-standard-json to destination;
+see code in folder unit_test, convert a source code to eevee-standard-json, and convert eevee-standard-json to destination;
 
 看unit_test中的代码，他演示了如何从源语言转换为eevee标准json，再从eevee标准json转为目标语言。
 
