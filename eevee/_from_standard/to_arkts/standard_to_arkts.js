@@ -148,9 +148,12 @@ module.exports = function (node,
 
     allRules.forEach(
       v => {
-        let key = JSON.stringify(v);
-        if (!ruleDict[key]) {
-          ruleDict[key] = 1;
+        let hashKey = JSON.stringify(v);
+
+
+
+        if (!ruleDict[hashKey]) {
+          ruleDict[hashKey] = 1;
           allRulesUnDup.push(v);
         }
       }

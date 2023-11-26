@@ -296,11 +296,13 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       view: "Flex",
       text: "Text",
       image: "Image",
+      page: "Flex",
       div: "Flex",
       span: "Text",
       img: "Image",
-      input: "TextInput",
+      body: "Flex",
 
+      input: "TextInput",
     }[node.tagName];
 
     ASSERT(destClassTagName);
@@ -348,6 +350,11 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
     } else if (destClassTagName === "Flex") {
       // debugger
 
+      // if (node.childNodes && node.childNodes[0].tagName === "text") {
+      //   debugger
+      // }
+
+
       node._isFlex = false;
       if (cssClassStyle.display === 'flex' // 弹性布局
         || defaultFlexDisplay
@@ -361,11 +368,12 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           destClassTagName = 'Row';
         }
       } else {
-        // debugger
-        if (!node.childNodes || !node.childNodes.length) {
+
+        if (node.tagName === 'page' || node.tagName === 'body') {
+          // destClassTagName = 'Flex';
+        } else if (!node.childNodes || !node.childNodes.length) {
           destClassTagName = 'Row';
         } else {
-
           // if (node.attrs?.id === 'aaa') debugger
 
           if (cssClassStyle.display) {
@@ -384,16 +392,16 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           let numBlock = 0;
           let hasFor = 0;
 
+          node._isAllTextChildren = !node.childNodes.filter(sn => !(sn.tagName === 'text' || sn.tagName === 'span' || !sn.tagName)).length
+
           for (let j = 0; j < node.childNodes.length; j++) {
             let subNode = node.childNodes[j];
+            if (subNode.computedStyle) subNode.computedStyle = {};
 
             genNodeCssXPathName(subNode, functionArray, styleHolder);
             let classDict = require("../../helpers/gen_all_possible_style.js")(Object.assign({}, subNode, { childNodes: null }), cssDomain, false, true);
-
             let allClassNames = Object.keys(classDict);
-
             let subDisplay = undefined;
-
 
             allClassNames.forEach(
               n => {
@@ -416,19 +424,30 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
               }
             }
 
+            subNode.computedStyle = subDisplay;
+
+            if (subDisplay !== "block" 
+                && subNode.tagName === 'text' && subNode.childNodes
+                && subNode.childNodes[0]
+                && subNode.childNodes[0].data 
+                && typeof subNode.childNodes[0].data === "string"
+                && subNode.childNodes[0].data.endsWith("\n")
+            ) {
+              subDisplay = 'block'; // will not use Row for it will cause a newline
+            }
+
             if (subDisplay === 'block') {
               numBlock++;
             } else {
               numInline++;
             }
             if (subNode.logic?.for) hasFor++;
-
-
           }
 
           if (numInline === node.childNodes.length) {
-            if (numInline <= 3 && !hasFor)
+            if (numInline <= 3 && !hasFor) {
               destClassTagName = 'Row';
+            } 
             // debugger
             // node._textAlign = cssClassStyle["text-align"];
           } else {
@@ -548,20 +567,20 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       else {
         
 
-        let tailsInnerStr = tails.cmds.filter(t=>t.startsWith(".font")||t.startsWith(".text")).join(``);
+        let tailsInnerStr = tails.cmds.filter(t=>isTextStyle(t)).join(``);
 
         if (!tails.elseCmds) {
-          let tailsWrapperStr = tails.cmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent}`);
+          let tailsWrapperStr = tails.cmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent}`);
 
           ret = `${indent}${ifString}${destClassTagName}(${genParams(node, destClassTagName, functionArray, styleHolder, cssDomain, sourceType, fns)}) {\n` + 
                   `${newLineIndent}${genIndent(1)}Text(/*autoText="2"*/${genParams(node, "Text", functionArray, styleHolder, cssDomain, sourceType, fns)})${tailsInnerStr}.width("100%"/*auto-text width 100%*/).height("100%"/*auto-text height 100%*/)\n` + 
                 `${newLineIndent}}${tailsWrapperStr}${ifStringEnd}\n`
         } else {
           debugger
-          let tailsWrapperStr = tails.cmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent_1}`);
+          let tailsWrapperStr = tails.cmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent_1}`);
 
-          let elseCmdsWrapperStr =tails.elseCmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent_1}`);
-          let elseCmdsInnerStr = tails.elseCmds.filter(t=>t.startsWith(".font")||t.startsWith(".text")).join(``);
+          let elseCmdsWrapperStr =tails.elseCmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent_1}`);
+          let elseCmdsInnerStr = tails.elseCmds.filter(t=>isTextStyle(t)).join(``);
   
           let newLineIndent_1 = newLineIndent + genIndent(1);
 
@@ -604,15 +623,25 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         }
       }
 
-      if (!node._isFlex && node._convertedTagName === "Row") {
+      if (!node._isFlex)
+      {
         let _textAlign = getInheritStyle(node, "textAlign");
-        if (_textAlign === 'right') {
-          tails.cmds.push('.justifyContent(FlexAlign.End)')
-          // debugger
-        } else if (_textAlign === 'center') {
-          tails.cmds.push('.justifyContent(FlexAlign.Center)')
+        if (node._convertedTagName === "Row") {
+          if (_textAlign === 'right') {
+            tails.cmds.push('.justifyContent(FlexAlign.End/*text-align right*/)')
+            // debugger
+          } else if (_textAlign === 'center') {
+            tails.cmds.push('.justifyContent(FlexAlign.Center/*text-align center*/)')
+          }
+          tails.cmds.push('.alignItems(VerticalAlign.Top)')
+        } else if (node._convertedTagName === "Column") {
+          if (_textAlign === 'right') {
+            tails.cmds.push('.alignItems(HorizontalAlign.End/*text-align right*/)')
+            // debugger
+          } else if (_textAlign === 'left' || _textAlign === undefined) {
+            tails.cmds.push('.alignItems(HorizontalAlign.Start/*text-align %{_textAlign}*)')
+          }
         }
-        tails.cmds.push('.alignItems(VerticalAlign.Top)')
       }
       
       let childNodesStringObj = node.childNodes.map(
@@ -668,7 +697,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       let innerChildrenNodeStr = childNodesStringObj.map(v=>v.str).join("").trim();
       let paramStr = genParams(node, destClassTagName, functionArray, styleHolder, cssDomain, sourceType, fns)
       if (!tails.elseCmds) {
-        let tailsStr = tails.cmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent}`);
+        let tailsStr = tails.cmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent}`);
         var ret = 
           `${indent}${ifString}${destClassTagName}(${paramStr}) {\n` + 
                 `${newLineIndent}${genIndent(1)}` +  innerChildrenNodeStr + "\n" + 
@@ -678,8 +707,8 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         innerChildrenNodeStr = innerChildrenNodeStr.replace(/\n/g, "\n" + genIndent(1));
 
         let newLineIndent_1 = newLineIndent + genIndent(1);
-        let tailsStr = tails.cmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent_1}`);
-        let elseTailsStr = tails.elseCmds.filter(t=>!t.startsWith(".font")&&!t.startsWith(".text")).join(`\n${newLineIndent_1}`);
+        let tailsStr = tails.cmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent_1}`);
+        let elseTailsStr = tails.elseCmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent_1}`);
 
         let nodeString1 = `if (${tails.extraIf}) {\n` + 
                               `${newLineIndent_1}${destClassTagName}(${paramStr}) {\n` + 
@@ -711,4 +740,8 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
 
 }
 
+
+function isTextStyle(t) {
+  return t.startsWith(".font")||t.startsWith(".text")||t.startsWith(".lineHeight")
+}
 

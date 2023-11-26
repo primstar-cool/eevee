@@ -1,4 +1,5 @@
 const traverseReplace = require('../utils/traverse_replace.js');
+const createDeclaration = require('../utils/create_css_node.js');
 
 const borderProperties = [
   "border-width",
@@ -118,16 +119,6 @@ module.exports = () => {
   function isBorderProperty(property) {
     return borderProperties.includes(property);
   };
-
-  function createDeclaration(property, value, parent, position = null) {
-    let node = new Object();
-    node.type = 'declaration';
-    node.property = property;
-    node.value = value;
-    node.parent = parent;
-    node.position = position;
-    return node;
-  }
 
   function extratParam(originalPName, raw) {
     let ret = {};

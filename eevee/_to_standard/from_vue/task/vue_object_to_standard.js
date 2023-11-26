@@ -144,7 +144,7 @@ module.exports = function vue2standard(root, filePath, rootSrcPath) {
 
   root.sourceType = 'vue';
   if (rootSrcPath && filePath)
-    root.path = require("path").relative(rootSrcPath, filePath);
+    root.path = require("path").relative(rootSrcPath, filePath).replace(/\\/g, "/");
   if (root.childNodes) {
     root.childNodes.forEach(
       n => {

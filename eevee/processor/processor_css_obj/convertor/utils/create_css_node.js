@@ -11,11 +11,11 @@ function createDeclaration(property, value, parent, position = null) {
   node.type = 'declaration';
   node.property = property;
   node.value = value;
-  node.parent = parent;
+  Object.defineProperty(
+    node, "parent", {value: parent, enumerable: false, writable: true}
+  );
   node.position = position;
   return node;
 }
 
-module.exports = {
-  createDeclaration
-};
+module.exports = createDeclaration

@@ -1,5 +1,5 @@
 const traverseReplace = require('../utils/traverse_replace.js');
-const {createDeclaration} = require('../utils/create_css_node.js');
+const createDeclaration = require('../utils/create_css_node.js');
 
 const colorMapping = require('../utils/color_mapping.js');
 const backgoundDefault = {

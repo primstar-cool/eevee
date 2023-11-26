@@ -1,4 +1,6 @@
 const traverseReplace = require('../utils/traverse_replace.js');
+const createDeclaration = require('../utils/create_css_node.js');
+
 const borderRadiusProps = [
   'border-radius',
   'border-top-left-radius',
@@ -73,22 +75,7 @@ module.exports = () => {
   function filter(node) {
     return node && node.type === 'declaration' && borderRadiusProps.includes(node.property);
   }
-  /**
-   * 创建属性描述
-   * @param {string} property 
-   * @param {string} value 
-   * @param {Object} parent 
-   * @param {Object} position 
-   */
-  function createDeclaration(property, value, parent, position = null) {
-    let node = new Object();
-    node.type = 'declaration';
-    node.property = property;
-    node.value = value;
-    node.parent = parent;
-    node.position = position;
-    return node;
-  }
+  
 
   /**
    * 展开border-radius属性

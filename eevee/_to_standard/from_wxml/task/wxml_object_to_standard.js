@@ -120,7 +120,7 @@ module.exports = function wxml2standard(root, filePath, rootSrcPath) {
   
   root.sourceType = 'wxml';
   if (rootSrcPath && filePath)
-    root.path = require("path").relative(rootSrcPath, filePath);
+    root.path = require("path").relative(rootSrcPath, filePath).replace(/\\/g, "/");
 };
 
 

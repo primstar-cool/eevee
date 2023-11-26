@@ -381,6 +381,14 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         // debugger
       }
 
+      if (!cmds.find(v=>v.startsWith(".lineHeight"))) {
+        
+        let _lineHeight = getInheritStyle(node, "lineHeight");
+        if (_lineHeight)
+          cmds.push(`.lineHeight("${_lineHeight}"/*inherit*/)`);
+        // debugger
+      }
+
       if (!cmds.find(v=>v.startsWith(".fontWeight"))) {
         // debugger
         let _fontWeight = getInheritStyle(node, "fontWeight");
@@ -877,7 +885,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
       } else {
         ASSERT(false, 'will support later');
       }
-    } else if (position1 === '"fixed"') {
+    } else if (position === '"fixed"') {
       debugger
     }
   }
@@ -1202,6 +1210,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           case "height":
           case "font-size":
           case "opacity": 
+          case "line-height":
+
             computedStyle[nN] =  inlineMode ? "eval(" + v + ")" : v;
 
             if (inlineMode) {
@@ -1389,6 +1399,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "right":
             case "bottom":
             case "left":
+            
               computedStyle[nN] =  "eval(" + (inlineMode ? v : JSON.stringify(v)) + ")";
               if (inlineMode) {
                 ret.push(`.${n_n}(${v})`)
@@ -1493,6 +1504,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               // debugger
             break;
             
+            
 
             default:
               computedStyle[nN] = inlineMode ? "eval(" + v + ")" : v;
@@ -1500,7 +1512,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             console.log(n_n)
 
             if (![
-              "line-height",
+              
 
               "pointer-events",
               "text-shadow",

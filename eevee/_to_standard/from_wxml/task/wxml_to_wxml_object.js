@@ -14,8 +14,10 @@ function wxml_to_wxml_object (content, filePath, rootSrcPath, readFileFunc, proc
     var node = parseXml(content);
     removeEmptyNode(node, true);
 
-    // const replaceConstWXIf = require("../../../processor/processor_xml_obj/replace_const_wxif.js"); 
-    // replaceConstWXIf(node, targetEnv);
+
+
+    const processTextDataTranslator = require("./process_text_data_translator.js"); 
+    processTextDataTranslator(node);
 
     if (processInclude) {
         if (!filePath || !readFileFunc) {

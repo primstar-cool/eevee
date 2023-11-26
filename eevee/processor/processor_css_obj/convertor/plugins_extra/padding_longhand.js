@@ -1,4 +1,5 @@
 const traverseReplace = require('../utils/traverse_replace.js');
+const createDeclaration = require('../utils/create_css_node.js');
 
 module.exports = () => {
   /**
@@ -47,22 +48,7 @@ module.exports = () => {
   function filter(node) {
     return node && node.type === 'declaration' && node.property === 'padding';
   }
-  /**
-   * 创建属性描述
-   * @param {string} property 
-   * @param {string} value 
-   * @param {Object} parent 
-   * @param {Object} position 
-   */
-  function createDeclaration(property, value, parent, position = null) {
-    let node = new Object();
-    node.type = 'declaration';
-    node.property = property;
-    node.value = value;
-    node.parent = parent;
-    node.position = position;
-    return node;
-  }
+
   /**
    * 创建padding展开形式的数据节点
    * @param {string} top 
