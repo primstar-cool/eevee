@@ -1,7 +1,7 @@
 # eevee
-一个工具集致力提供鸿蒙arkts/vue/react/rn/各类小程序/快应用的UI代码的互转;
 a toolkit focus on mutual convert UI code of arkts(harmony)/vue/react/react native/mini programe(wx,tt,baidu,ks)/hap;
 
+一个工具集致力提供鸿蒙arkts/vue/react/rn/各类小程序/快应用的UI代码的互转;
 
 
 # how to use / 怎么使用
@@ -15,12 +15,11 @@ wxmp(without wxs translation);vue (vue 2 style);react_native(just a simple suppo
 微信小程序(不支持wxs解析)；vue (vue2风格);react_native(仅简单支持);arkts(开发中...)；
 
 # destination code type (some of them were outdated and will not be updated)  / 目标语言类型（有些过时了将不再更新）
-vue2/vue3/react/react native/harmony arkts/android hap app/wxmp/ttma/swan/ksmp/graphics render[cpp(opengl 1.x/2.x/D3D9/D3D11); js(canvas/webgl); as3(flash stage2d/stage3s)]
-
-vue2/vue3/react/react native/鸿蒙arkts/安卓快应用/小程序(微信/头条/百度/快手)/图形渲染[cpp(opengl 1.x/2.x/D3D9/D3D11); js(cavas/webgl); as3(flash stage2d/stage3s)]
-
+includs vue2/vue3/react/react native/harmony arkts/android hap app/wxmp/ttma/swan/ksmp/graphics render[cpp(opengl 1.x/2.x/D3D9/D3D11); js(canvas/webgl); as3(flash stage2d/stage3s)]
 
 *unity3d(C#)/ios widget(swift) will be supported if I have time; Flutter(Dart)/uniapp will not be supported since they were already designed for multi-platform；
+
+支持vue2/vue3/react/react native/鸿蒙arkts/安卓快应用/小程序(微信/头条/百度/快手)/图形渲染[cpp(opengl 1.x/2.x/D3D9/D3D11); js(cavas/webgl); as3(flash stage2d/stage3s)]
 
 *unity3d(C#)/ios widget(swift)等我有时间会支持下；Flutter(Dart)/uniapp应该不会支持，它们本就为跨平台设计。
 
