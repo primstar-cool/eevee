@@ -8,7 +8,7 @@ function ASSERT (flag, ...args) {
 
 const createMappedFunction = require("../../processor/processor_xml_obj/create_mapped_function.js");
 
-module.exports = function (node, ast) {
+module.exports = function getExpressionWithForDomain(node, ast , replaceContext = 'this') {
 
    let astString = createMappedFunction.createFunctionReturnStr(ast);
 
@@ -43,7 +43,9 @@ module.exports = function (node, ast) {
     })
 
     let useIfFilter =  astStringOld !== astString;
-    astString = astString.replace(/_cONTEXT\./g, "this.");
+
+    if (replaceContext)
+        astString = astString.replace(/_cONTEXT\./g, `${replaceContext}.`);
 
     return {astString, forItems, useIfFilter}
 }

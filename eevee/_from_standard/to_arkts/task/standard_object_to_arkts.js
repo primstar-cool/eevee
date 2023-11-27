@@ -634,7 +634,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
             tails.cmds.push('.justifyContent(FlexAlign.End/*text-align right*/)')
             // debugger
           } else if (_textAlign === 'center') {
-            tails.cmds.push('.justifyContent(FlexAlign.Center/*text-align center*/)')
+            tails.cmds.push(`.justifyContent(FlexAlign.Center/*text-align center*/)`)
           }
           tails.cmds.push('.alignItems(VerticalAlign.Top)')
         } else if (node._convertedTagName === "Column") {
@@ -642,7 +642,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
             tails.cmds.push('.alignItems(HorizontalAlign.End/*text-align right*/)')
             // debugger
           } else if (_textAlign === 'left' || _textAlign === undefined) {
-            tails.cmds.push('.alignItems(HorizontalAlign.Start/*text-align %{_textAlign}*)')
+            tails.cmds.push(`.alignItems(HorizontalAlign.Start/*text-align ${_textAlign}*/)`)
           }
         }
       }

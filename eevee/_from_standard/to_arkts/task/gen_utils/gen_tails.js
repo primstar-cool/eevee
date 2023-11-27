@@ -4,6 +4,7 @@ const getObjectDataExpression = require("../../../../exporter/string_utils/get_o
 const createMappedFunction = require("../../../../processor/processor_xml_obj/create_mapped_function.js");
 const javascript = require('../../../../parser/parse_ast/javascript');
 const getInheritStyle = require("../../../helpers/get_inherit_style.js");
+const getExpressionWithForDomain = require("../../../helpers/get_expression_with_for_domain.js");
 
 function ASSERT (flag, ...args) {
   if (!flag) {
@@ -14,6 +15,7 @@ function ASSERT (flag, ...args) {
 
 
 module.exports = function genTails(node, functionArray, styleHolder, cssDomain, sourceType, appendTextStyle) {
+    // if (node.tagName === 'input') debugger
     
   //  if (node.tagName.startsWith("::")) debugger
 
@@ -144,12 +146,24 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   alternate = "undefined"
                 }
                 cmds.push(propery + `(${condiText} ? ${consequent} : ${alternate})`);
-                node.computedStyle[propery] = {
-                  condition: condi,
-                  conditionText: condiText,
-                  consequent: computedStyleC[propery],
-                  alternate: computedStyleA[propery],
-                }
+                let properyKey = propery.substr(1);
+                // debugger
+                node.computedStyle[properyKey] = 
+                new javascript.astFactory.ConditionalExpression(
+                  condi,
+                  computedStyleC[properyKey],
+                  computedStyleA[properyKey],
+                );
+                Object.defineProperty(
+                  node.computedStyle[properyKey], "conditionText", {value: condiText, enumerable: false}
+                )
+                
+                // {
+                //   condition: condi,
+                //   conditionText: condiText,
+                //   consequent: computedStyleC[propery],
+                //   alternate: computedStyleA[propery],
+                // }
               }
             } 
             else { // 非二分
@@ -182,6 +196,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
 
                 let mergedCondi;
+                debugger
 
                 ASSERT(mergedCondiArr.length)
                 if (mergedCondiArr.length === 1) {
@@ -227,23 +242,32 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   } else {
                     alternate = "undefined"
                   }
-                  
+                  let properyKey = propery.substr(1);
+
                   if (swapTime) {
                     cmds.push(propery + `(${condiText} ? ${alternate} : ${consequent})`);
-                    node.computedStyle[propery] = {
-                      condition: mergedCondi,
-                      conditionText: condiText,
-                      consequent: computedStyleA[propery],
-                      alternate: computedStyleC[propery],
-                    }
+
+                    node.computedStyle[properyKey] = new javascript.astFactory.ConditionalExpression(
+                      mergedCondi,
+                      (computedStyleA[properyKey]),
+                      (computedStyleC[properyKey]),
+                    );
+                    Object.defineProperty(
+                      node.computedStyle[properyKey], "conditionText", {value: condiText, enumerable: false}
+                    )
+                    
                   } else {
                     cmds.push(propery + `(${condiText} ? ${consequent} : ${alternate})`);
-                    node.computedStyle[propery] = {
-                      condition: mergedCondi,
-                      conditionText: condiText,
-                      consequent: computedStyleC[propery],
-                      alternate: computedStyleA[propery],
-                    }
+                    
+                    node.computedStyle[properyKey] = new javascript.astFactory.ConditionalExpression(
+                      mergedCondi,
+                      (computedStyleC[properyKey]),
+                      (computedStyleA[properyKey]),
+                    );
+                    Object.defineProperty(
+                      node.computedStyle[properyKey], "conditionText", {value: condiText, enumerable: false}
+                    )
+                    
                   }
                 }
                 useConditionExpression = true;
@@ -334,8 +358,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (cmds.find(v=>v.startsWith(".backgroundImage"))) {
       if (node.computedStyle.backgroundSizeWidth || node.computedStyle.backgroundSizeHeight)
       {
-        let width = node.computedStyle.backgroundSizeWidth || '"100%"';
-        let height = node.computedStyle.backgroundSizeHeight || '"100%"';
+        let width = node.computedStyle.backgroundSizeWidth || '100%';
+        let height = node.computedStyle.backgroundSizeHeight || '100%';
 
         if (width.startsWith("eval(")) width = width.slice(5, -1);
         if (height.startsWith("eval(")) height = height.slice(5, -1);
@@ -346,10 +370,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         } else if (width === 'contain') {
           cmds.push(`.backgroundImageSize(ImageSize.Contain)`)
         } else {
-          cmds.push(`.backgroundImageSize({width: ${(width)}, height: ${(height)}})`)
+          cmds.push(`.backgroundImageSize({width: "${(width)}", height: "${(height)}"})`)
         }
-
-        
       }
     }
 
@@ -381,7 +403,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         // debugger
       }
 
-      if (!cmds.find(v=>v.startsWith(".lineHeight"))) {
+      if (node._convertedTagName !== 'Input' && !cmds.find(v=>v.startsWith(".lineHeight"))) {
         
         let _lineHeight = getInheritStyle(node, "lineHeight");
         if (_lineHeight)
@@ -553,7 +575,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               }
               try {
 
-                let margin = eval(marginStr);
+                let margin = computedStyle.margin;
                 let marginNew;
                 if (!margin.right) {
                   let objStartIndex = marginStr.indexOf("{")
@@ -562,10 +584,10 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                 } else {
                   right = eval(right);
                   let newMarginRight = plusPixel(right + margin.right);
-                  if (!newMarginRight.endsWith(`"`))
-                    newMarginRight = `"${newMarginRight}"/*simu plus on righth*/`
-                  else 
-                    newMarginRight +=`/*simu plus on right*/`
+
+                  if (typeof newMarginRight === 'object') newMarginRight = getExpressionWithForDomain(node, newMarginRight).astString;
+
+                  newMarginRight +=`/*simu plus on right*/`
                   marginNew = marginStr.replace(/right:[\s]*\"[a-z0-9A-Z]\"+/, `right: ${newMarginRight}`);
                 }
                 let idx = cmds.indexOf(marginStr);
@@ -587,10 +609,11 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             }
 
             posX = plusPixel(parentWidth, right);
-            if (!posX.endsWith(`"`))
-              posX = `"${posX}"/*minus by parent width*/`
-            else 
-              posX +=`/*minus by parent width*/`
+            // if (typeof posX === 'object') debugger
+            if (typeof posX === 'object') posX = getExpressionWithForDomain(node, posX).astString;
+            else posX = JSON.stringify(posX);
+
+            posX +=`/*minus by parent width*/`
           }
 
           
@@ -726,7 +749,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           // debugger
           if (!parentHeight) {
 
-             
             // ASSERT(false, "not tested yet")
 
             if (!cmds.find(v=>v.startsWith(".margin("))) {
@@ -737,7 +759,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                 while (marginStr.includes(extraIf))  marginStr = marginStr.replace(extraIf, bool ? "true" : 'false');
               }
               try {
-                let margin = eval(marginStr);
+                let margin = computedStyle.margin;
                 let marginNew;
                 if (!margin.bottom) {
                   let objStartIndex = marginStr.indexOf("{")
@@ -746,10 +768,9 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                 } else {
                   bottom = eval(bottom);
                   let newMarginBottom = plusPixel(bottom + margin.bottom);
-                  if (!newMarginBottom.endsWith(`"`))
-                    newMarginBottom = `"${newMarginBottom}"/*simu plus on bottom*/`
-                  else 
-                    newMarginBottom +=`/*simu plus on bottom*/`
+                  if (typeof newMarginBottom === 'object') newMarginBottom = getExpressionWithForDomain(node, newMarginBottom).astString;
+
+                  newMarginBottom +=`/*simu plus on bottom*/`
                   marginNew = marginStr.replace(/bottom:[\s]*\"[a-z0-9A-Z]\"+/, `bottom: ${newMarginBottom}`);
                 }
                 let idx = cmds.indexOf(marginStr);
@@ -771,11 +792,12 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             }
 
             posY = plusPixel(parentHeight, bottom);
-            // debugger
-            if (!posY.endsWith(`"`))
-              posY = `"${posY}"/*minus by parent height*/`
-            else
-              posY +=`/*minus by parent height*/`
+            
+            if (typeof posY === 'object') debugger
+            if (typeof posY === 'object') posY = getExpressionWithForDomain(node, posY).astString;
+            else posY = JSON.stringify(posY)
+
+            posY +=`/*minus by parent height*/`
           }
 
 
@@ -1145,7 +1167,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               literalString = ""
             }
             
-            let {astString} = require("../../../helpers/get_expression_with_for_domain.js")(node, v);
+            let {astString} = getExpressionWithForDomain(node, v);
 
             valueArrNew.push(astString)
 
@@ -1198,10 +1220,13 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         switch (n_n) {
           case "background-color": 
           case "color":
+            
+            computedStyle[nN] = v;
             if (n_n === 'color') {
               nN = 'fontColor';
+              computedStyle.fontColor = v;
+
             } 
-            computedStyle[nN] = v;
             ret.push(`.${nN}(${convertColor(v)})`)
 
             // debugger
@@ -1211,28 +1236,29 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           case "font-size":
           case "opacity": 
           case "line-height":
-
-            computedStyle[nN] =  inlineMode ? "eval(" + v + ")" : v;
-
             if (inlineMode) {
-              v = eval(v)
+              try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
             }
-            computedStyle[nN] = v;
 
+            computedStyle[nN] = v;
             // debugger
-            ret.push(`.${nN}(${convertLength(v)})`)
+
+            if (!(node._convertedTagName === 'Inpubt' && n_n === "line-height"))
+              ret.push(`.${nN}(${convertLength(v)})`)
             
             break;
           case "z-index": 
             if (inlineMode) {
               if (v[0] === '"')
-                v = eval(v)
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
             }
             ret.push(`.${nN}(${v})`)
             computedStyle[nN] =  v;
 
           break;
           case "display":
+            if (!computedStyle.display)
+              computedStyle.display = v;
             //TODO
           break; 
           case "flex-direction":
@@ -1240,22 +1266,21 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               ASSERT(v === 'row' || v === 'column')
               // ret.push(`.${nN}(${v})`)
             }
+            computedStyle.flexDirection = v;
+
           break; 
           case "font-weight":
-            computedStyle.fontWeight = v;
             v = convertFontWeight(v);
-            
-
+            computedStyle.fontWeight = v.toLowerCase();
             ret.push(`.${nN}(FontWeight.${v})`)
             break;
           case "text-align":
             computedStyle.textAlign = v;
             if (v === 'left') v = "Start";
-            else if (v === 'right') v = "End"; //TODO check container if reverse
+            else if (v === 'right') v = "End"; // TODO check container if reverse
             else v = v[0].toUpperCase() + v.substr(1);
 
             ASSERT(["Start", "Center", "End"].includes(v))
-
             if (isNaN(v)) {
               ret.push(`.${nN}(TextAlign.${v})`)
             } 
@@ -1268,7 +1293,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
             if (n_n === "padding") {
               v = convertLength(v);
-
               paddingObject = {
                 left: v, 
                 right: v,
@@ -1278,7 +1302,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
             } else if (n_n === "margin") {
               v = convertLength(v);
-
               marginObject = {
                 left: v, 
                 right: v,
@@ -1287,12 +1310,11 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               }
 
             } else if (n_n === "border-width") {
-              if (v === 'thin') v = '"1px"';
-              else if (v === 'medium') v = '"3px"';
-              else if (v === 'thick') v = '"4px"';
+              if (v === 'thin') v = '"1vp"';
+              else if (v === 'medium') v = '"3vp"';
+              else if (v === 'thick') v = '"4vp"';
               else v = convertLength(v);
 
-              
               borderWidthObject = {
                 left: v, 
                 right: v,
@@ -1309,7 +1331,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               }
             }
             
-
             break;
             case "margin-left":
             case "margin-right":
@@ -1323,29 +1344,22 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "border-right-width":
             case "border-top-width":
             case "border-bottom-width":
-
               if (inlineMode) {
-                v = eval(v);
-              } 
-
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              }
               if (n_n.startsWith("padding") ){
                 paddingObject[n_n.substr(8)] = convertLength(v);
               } else if (n_n.startsWith("margin") ) {
                 marginObject[n_n.substr(7)] = convertLength(v);
               }  else if (n_n.startsWith("border-") ) {
-
-                if (v === 'thin') v = '1px';
-                else if (v === 'medium') v = '3px';
-                else if (v === 'thick') v = '4px';
-                v = convertLength(v);
-
-
+                if (v === 'thin') v = '"1vp"';
+                else if (v === 'medium') v = '"3vp"';
+                else if (v === 'thick') v = '"4vp"';
+                else v = convertLength(v);
                 borderWidthObject[n_n.slice(7, -6)] = v;
               }
               break;
-
             case "border-color":
-              
               v = convertColor(v);
               borderColorObject = {
                 left: v, 
@@ -1359,15 +1373,10 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "border-top-color":
             case "border-bottom-color":
               if (v === "currentcolor") {
-                borderColorObject[n_n.slice(7, -6)] = `"#00000000"`;
-                break;
-              }
-              else if (v[0] === '#') {
-               v = "0x" + v.substr(1);
+                borderColorObject[n_n.slice(7, -6)] = `Color.Transparent`;
               } else {
-                ASSERT(false, 'not support yet')
+                borderColorObject[n_n.slice(7, -6)] = convertColor(v);
               }
-              borderColorObject[n_n.slice(7, -6)] = v;
             break;
 
             case "border-style":
@@ -1399,11 +1408,12 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "right":
             case "bottom":
             case "left":
-            
-              computedStyle[nN] =  "eval(" + (inlineMode ? v : JSON.stringify(v)) + ")";
+              
               if (inlineMode) {
+                computedStyle[nN] = v;
                 ret.push(`.${n_n}(${v})`)
               } else {
+                computedStyle[nN] = `${v}`;
                 ret.push(`.${n_n}("${v}")`)
               }
             break;
@@ -1429,21 +1439,25 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "box-sizing":
             case "flex-direction":
             case "flex-wrap":
-              computedStyle[nN] =  inlineMode ? "eval(" + v + ")" : v;
-            break;
-            case "background-image":
+              if (inlineMode) {
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              }
               computedStyle[nN] = v;
 
-              if (v.startsWith('"')) { // expression
+            break;
+            case "background-image":
+
+            if (inlineMode) { // expression
+              computedStyle[nN] = "eval(" + v + ")";
+            
+              if (v.startsWith('"')) {
                 let vArr = v.split(" + ");
                 // debugger
-
-                if (vArr[0][0] === "\"" && vArr[vArr.length-1][0] === "\"") {
+                if (vArr[0][0] === "\"" && vArr[vArr.length - 1][0] === "\"") {
                   vArr[0] = eval(vArr[0]).trim();
-
                   if (vArr[0].startsWith("url(")) {
                     vArr[0] = vArr[0].substr(4);
-
+            
                     if (vArr[0] === "") {
                       vArr.shift();
                     } else {
@@ -1452,13 +1466,13 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   } else {
                     ASSERT(false, 'parse error')
                   }
-
-                  let lastIndex = vArr.length -1;
+            
+                  let lastIndex = vArr.length - 1;
                   vArr[lastIndex] = eval(vArr[lastIndex]);
-
+            
                   if (vArr[lastIndex].startsWith(")")) {
                     vArr[lastIndex] = vArr[lastIndex].slice(0, -1);
-
+            
                     if (vArr[vArr.length - 1] === "") {
                       vArr.pop();
                     } else {
@@ -1467,43 +1481,44 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   } else {
                     ASSERT(false, 'parse error')
                   }
-                  ret.push(`.backgroundImage(${vArr.join(" + ")})`)
-
-                } else {
-                  debugger
-                  console.error('unknown bg')
-                  v = `(${v}).trim().slice(4, -1)`
+                  ret.push(`.backgroundImage(${vArr.join(" + ")})`);
+                }  else {
+                  ASSERT(false, 'parse error')
                 }
-
-                // debugger
-
+                
               } else {
                 debugger
-                let v = v.trim();
-                if (v.startsWith("url(") && v.endsWith(")")) {
-                  v = v.slice(4, -1);
-                  if (v[0] === '"' || v[0] === '\'')
-                    v = eval(v);
-                } else {
-                  ASSERT(false)
-                }
-                if (v.trim())
-
-                ret.push(`.backgroundImage("${v}")`)
+                console.error('unknown bg')
+                v = `(${v}).trim().slice(4, -1)`
               }
+                // debugger
+            } else { //un inline mode
+              debugger
+              let v = v.trim();
+              computedStyle[nN] = v;
+            
+              if (v.startsWith("url(") && v.endsWith(")")) {
+                v = v.slice(4, -1);
+                if (v[0] === '"' || v[0] === '\'')
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              } else {
+                ASSERT(false)
+              }
+              if (v.trim())
+                ret.push(`.backgroundImage("${v}")`)
+            }
             break;
             case "backgroundSizeWidth": 
             case "backgroundSizeHeight": 
-              computedStyle[nN] = "eval(" + (inlineMode ? v : JSON.stringify(v)) + ")";
-              // debugger
-            break;
             case "min-height":
             case "min-width":
-
-              node.computedStyle[nN] = v;
+              if (inlineMode) {
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              }
+              computedStyle[nN] = v;
+              
               // debugger
             break;
-            
             
 
             default:
@@ -1512,8 +1527,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             console.log(n_n)
 
             if (![
-              
-
               "pointer-events",
               "text-shadow",
               "pseudo",
@@ -1532,7 +1545,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     );
 
     let isNoneBorder;
-
     Object.keys(borderStyleObject).forEach(
       k => {
         if (borderStyleObject[k] === "BorderStyle.None") {
@@ -1543,204 +1555,166 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
     isNoneBorder = !Object.keys(borderStyleObject).length;
     
-
-    if (isNoneBorder && Object.keys(borderStyleObject).length) {
-
-      let borderStyleString = getExpandString(borderStyleObject);
-        
-      isNoneBorder = true;
-
-      if (!isNoneBorder) {
-        ret.push(`.borderStyle(${borderStyleString})`)
-
-      }
+    if (!isNoneBorder) {
+      let borderStyleString = getExpandString(borderStyleObject, 'borderStyle', computedStyle);
+      ret.push(`.borderStyle(${borderStyleString})`)
     }
 
     if (!isNoneBorder) {
       if (Object.keys(borderWidthObject).length) {
-        ret.push(`.borderWidth(${getExpandString(borderWidthObject)})`)
+        ret.push(`.borderWidth(${getExpandString(borderWidthObject, 'borderWidth', computedStyle)})`)
       } 
       if (Object.keys(borderColorObject).length) {
-        ret.push(`.borderColor(${getExpandString(borderColorObject)})`)
+        ret.push(`.borderColor(${getExpandString(borderColorObject, 'borderColor', computedStyle)})`)
       } 
     }
 
 
 
     if (Object.keys(marginObject).length) {
-      let str = getExpandString(marginObject);
-      ret.push(`.margin(${str})`)
-      try {
-        computedStyle.margin =  eval(str)
-      } catch (e) {
-        computedStyle.margin = 'eval(' + str + ")"
-      }
+      let str = getExpandString(marginObject, 'margin', computedStyle);
+      ret.push(`.margin(${str})`);
     } 
     if (Object.keys(paddingObject).length) {
-      let str = getExpandString(paddingObject)
-      ret.push(`.padding(${str})`)
-      try {
-        computedStyle.padding =  eval(str);
-      } catch (e) {
-        computedStyle.padding = 'eval(' + str + ")"
-      }
+      let str = getExpandString(paddingObject, 'padding', computedStyle);
+      ret.push(`.padding(${str})`);
     } 
 
     if (Object.keys(borderRadiusObject).length) {
-      let str = getExpandString(borderRadiusObject);
+      // debugger
+      let str = getExpandString(borderRadiusObject, 'borderRadius', computedStyle);
       ret.push(`.borderRadius(${str})`)
-      try {
-        computedStyle.borderRadius =  eval(str);
-      } catch (e) {
-        computedStyle.borderRadius = 'eval(' + str + ")"
-      }
     } 
 
-    let minWidth = computedStyle.minWidth;
-    let minHeight = computedStyle.minHeight;
-    {
-      
-      if (minWidth || minHeight) {
-        if (!node.childNodes) node.childNodes = [];
+    _processBoxSizing();
+    
+    // if (computedStyle.borderRadius === '*') debugger
 
-        let newChildName;
-
-        if (minWidth && minHeight) 
-        {
-          newChildName = '::min-width-height';
-        } else {
-          newChildName = minWidth ? '::min-width' : '::min-height';
-        }
-
-        node.childNodes.unshift(
-          {
-            get parentNode () {
-              return node
-            },
-            tagName: newChildName,
-            _convertedTagName: "Column",
-            logic: {
-              uuid: typeof node.logic.uuid === 'string' ? node.logic.uuid + newChildName :
-                (
-                  (node.logic.uuid.type === 'Literal') ? node.logic.uuid.value + newChildName :
-                    {
-                      type: "BinaryExpression",
-                      left: node.logic.uuid,
-                      operator: '+',
-                      right: {
-                        type: 'Literal',
-                        value: newChildName
-                      }
-                    }
-                )
-            },
-            attrs: {
-              style: (minWidth ? `width:${minWidth};margin-right:-${minWidth};` : '')
-              + (minHeight ? `height:${minHeight};margin-bottom:-${minHeight};` : '')
-              + `z-index:-999;`
-            }
-          }
-        )
-      }
-      
+    
+    if (cssClassStyle.pseudo) {
+      _processPseudo();
+      // debugger
     }
+   
 
-    {
-      let paddingStr = ret.find(v=>v.startsWith(".padding("))
-      if (paddingStr) {
-        let widthStr = ret.find(v=>v.startsWith(".width("))
-        let heightStr = ret.find(v=>v.startsWith(".height("))
-        let paddingObject = paddingStr.substr(8);
-        let paddingObjectE = eval(paddingObject);
+    ret.forEach(
+      str => {
+        let strArray = str.split("(");
+        let name = strArray[0].substr(1)
 
-        if (!computedStyle.boxSizing || computedStyle.boxSizing === 'content-box') {
+        // debugger
+        if (!computedStyle[name]) {
+          ASSERT(false);
+          ASSERT(strArray.length === 2 && strArray[0][0] === '.');
           try {
-            paddingObjectE = eval(paddingObject);
+            computedStyle[name] = eval("(" + strArray[1]);
           } catch (e) {
-            ASSERT(false, 'content-box must has a certain padding')
+            ASSERT(false);
           }
+        }
+      }
+    );
 
-          if (typeof paddingObjectE === 'string') {
-            debugger
-            let totalL = plusPixel(evel(paddingObjectE), evel(paddingObjectE));
+
+    return ret;
+
+    function _processBoxSizing() {
+
+      let minWidth = computedStyle.minWidth;
+      let minHeight = computedStyle.minHeight;
+      {
+        
+        if (minWidth || minHeight) {
+          if (!node.childNodes) node.childNodes = [];
   
-            if (widthStr) {
-              ret[ret.indexOf(widthStr)] = `.width("${plusPixel(totalL, eval(widthStr.substr(6)))}"/*${paddingObjectE} * 2 + ${eval(widthStr.substr(6))}*/)`
-            }
-            if (heightStr) {
-              ret[ret.indexOf(heightStr)] = `.height("${plusPixel(totalL, eval(heightStr.substr(7)))}/*${paddingObjectE} * 2 + ${eval(widthStr.substr(7))}*/")`
-            }
-
+          let newChildName;
+  
+          if (minWidth && minHeight) {
+            newChildName = '::min-width-height';
           } else {
+            newChildName = minWidth ? '::min-width' : '::min-height';
+          }
+  
+          node.childNodes.unshift(
+            {
+              get parentNode () {
+                return node;
+              },
+              tagName: newChildName,
+              _convertedTagName: "Column",
+              logic: {
+                uuid: typeof node.logic.uuid === 'string' ? node.logic.uuid + newChildName :
+                  (
+                    (node.logic.uuid.type === 'Literal') ? node.logic.uuid.value + newChildName :
+                      {
+                        type: "BinaryExpression",
+                        left: node.logic.uuid,
+                        operator: '+',
+                        right: {
+                          type: 'Literal',
+                          value: newChildName
+                        }
+                      }
+                  )
+              },
+              attrs: {
+                style: (minWidth ? `width:${minWidth};margin-right:-${minWidth};` : '')
+                + (minHeight ? `height:${minHeight};margin-bottom:-${minHeight};` : '')
+                + `z-index:-999;`
+              }
+            }
+          )
+        }
+        
+      }
+  
+      {
+        let paddingStr = ret.find(v=>v.startsWith(".padding("))
+        if (paddingStr) {
+          let widthStr = ret.find(v=>v.startsWith(".width("))
+          let heightStr = ret.find(v=>v.startsWith(".height("))
+          let paddingObjectE = computedStyle.padding;
+  
+          if (!computedStyle.boxSizing || computedStyle.boxSizing === 'content-box') {
+  
+            ASSERT(!Object.keys(paddingObjectE).filter(k => (""+paddingObjectE[k]).startsWith("eval")).length, 'content-box must has a certain padding')
+            
   
             if (widthStr) {
-              let v = (eval(widthStr.substr(6)));
-              if (paddingObjectE.left) {
-                v = plusPixel(v, (paddingObjectE.left))
-              }
-              if (paddingObjectE.right) {
-                v = plusPixel(v, (paddingObjectE.right))
-              }
+              let v = computedStyle.width;
+              let mergeLR = plusPixel(paddingObjectE.left || 0, paddingObjectE.right || 0);
   
-              if (paddingObjectE.left || paddingObjectE.right) {
+              if (mergeLR) {
+                v = plusPixel(v, (mergeLR))
+                if (typeof v === 'object') {
+                  v = getExpressionWithForDomain(node, v).astString;
+                }
                 ret[ret.indexOf(widthStr)] = `.width("${v}" /*${paddingObjectE.left||0} + ${eval(widthStr.substr(6))} + ${paddingObjectE.right||0}*/)`
               }
             }
   
             if (heightStr) {
               // debugger
-              let v = (eval(heightStr.substr(7)));
-              if (paddingObjectE.top) {
-                v = plusPixel(v, (paddingObjectE.top))
-              }
-              if (paddingObjectE.bottom) {
-                v = plusPixel(v, (paddingObjectE.bottom))
-              }
-  
-              if (paddingObjectE.top || paddingObjectE.bottom)
-              ret[ret.indexOf(heightStr)] = `.height("${v}" /*${paddingObjectE.top||0} + ${eval(heightStr.substr(7))} + ${paddingObjectE.bottom||0}*/)`
-            }
-            
-          }
-
-        } else { //border box
-          let maxHeight = computedStyle.maxHeight;
-        
-          let maxWidth = computedStyle.maxWidth;
-
-          if (minHeight || maxHeight || minWidth || maxWidth) {
-            try {
-              paddingObjectE = eval(paddingObject);
-              ASSERT(node.childNodes[0].tagName.startsWith("::min-"))
-            } catch (e) {
-              ASSERT(false, 'border-box with min/max-width min/max-height  must has a certain padding')
-            }
-
-            if (typeof paddingObjectE === 'string') {
-              debugger
-              let totalL = plusPixel(evel(paddingObjectE), evel(paddingObjectE));
-              totalL = "-" + totalL; //padding always > 0
-
-              if (minHeight !== undefined) {
-                minHeight = plusPixel(totalL, minHeight);
-              }
-              if (maxHeight !== undefined) {
-                maxHeight = plusPixel(totalL, maxHeight);
-              }
-              if (minWidth !== undefined) {
-                minWidth = plusPixel(totalL, minWidth);
-              }
-              if (maxWidth !== undefined) {
-                maxWidth = plusPixel(totalL, maxWidth);
-              }
-
-            } else {
-
-              let mergeLR = plusPixel(paddingObjectE.left || 0, paddingObjectE.right || 0);
+              let v = computedStyle.height;
               let mergeTB = plusPixel(paddingObjectE.top || 0, paddingObjectE.bottom || 0);
+              if (mergeTB) {
+                v = plusPixel(v, mergeTB)
+                if (typeof v === 'object') {
+                  v = getExpressionWithForDomain(node, v).astString;
+                }
+                ret[ret.indexOf(heightStr)] = `.height("${v}" /*${paddingObjectE.top||0} + ${eval(heightStr.substr(7))} + ${paddingObjectE.bottom||0}*/)`
+              }
+            }
+  
+          } else { // border box
+            let maxHeight = computedStyle.maxHeight;
+            let maxWidth = computedStyle.maxWidth;
+  
+            if (minHeight || maxHeight || minWidth || maxWidth) {
+              ASSERT(!Object.keys(paddingObjectE).filter(k => paddingObjectE(k).startsWith("eval")).length, 'content-box must has a certain padding')
+            
               if (mergeLR) mergeLR = "-" + mergeLR; //padding always > 0
               if (mergeTB) mergeTB = "-" + mergeTB; //padding always > 0
-
               if (minHeight !== undefined) {
                 minHeight = plusPixel(mergeTB, minHeight);
               }
@@ -1753,37 +1727,40 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               if (maxWidth !== undefined) {
                 maxWidth = plusPixel(mergeLR, maxWidth);
               }
-
-
+  
+              if (typeof minHeight === 'object') {
+                minHeight = getExpressionWithForDomain(node, minHeight).astString;
+              }
+  
+              if (typeof minWidth === 'object') {
+                minWidth = getExpressionWithForDomain(node, minWidth).astString;
+              }
+  
+              if (computedStyle.minHeight) {
+  
+                node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
+                  .replace(`height:${(computedStyle.minHeight)}`, `height:${(minHeight)}`)
+                  .replace(`margin-bottom:${(computedStyle.minHeight)}`, `margin-bottom:${minHeight}`)
+              }
+              if (computedStyle.minWidth) {
+                node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
+                  .replace(`width:${(computedStyle.minWidth)}`, `width:${(minWidth)}`)
+                  .replace(`margin-right:${(computedStyle.minWidth)}`, `margin-right:${minWidth}`)
+              }
+  
             }
-
-            if (computedStyle.minHeight) {
-
-
-
-              node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
-                .replace(`height:${(computedStyle.minHeight)}`, `height:${(minHeight)}`)
-                .replace(`margin-bottom:${(computedStyle.minHeight)}`, `margin-bottom:${minHeight}`)
-            }
-            if (computedStyle.minWidth) {
-              node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
-                .replace(`width:${(computedStyle.minWidth)}`, `width:${(minWidth)}`)
-                .replace(`margin-right:${(computedStyle.minWidth)}`, `margin-right:${minWidth}`)
-            }
-
           }
+  
+            
         }
-
-          
       }
     }
-    
+    function _processPseudo() {
 
-    if (cssClassStyle.pseudo) {
-      // debugger
 
       let pseudoStyles = cssClassStyle.pseudo.map(
         v => {
+          // debugger
           let computedStyle = {};
           let retString = getValueString(v.style, computedStyle);
           return {
@@ -1795,8 +1772,17 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         }
       );
 
+
+      if (computedStyle.borderRadius && typeof computedStyle.borderRadius !== 'object') debugger
+      
+
       pseudoStyles.forEach(
-        obj => {
+        (obj, _i) => {
+          
+          if (pseudoStyles)
+
+          if (computedStyle.borderRadius && typeof computedStyle.borderRadius !== 'object') debugger
+
           let nodeIndex;
           let nodeTotal;
     
@@ -1818,27 +1804,39 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           }
 
           let condition;
+          let conditionObj;
           if (obj.rule === 'first-child') {
             // debugger
             if (!isNaN(nodeIndex)) {
               if (nodeIndex === 0) {
-                mergeStyles(ret, obj, node);
+                mergeStyles(ret, computedStyle, obj, node);
               }
               return;
             } else {
               condition = `${nodeIndex} === 0`;
+              conditionObj = new javascript.astFactory.BinaryExpression(
+                "===",
+                new javascript.astFactory.Identifier(nodeIndex),
+                new javascript.astFactory.Literal(0),
+              )
             }
           } else if (obj.rule === 'last-child') {
-            // debugger
+            
             if (!isNaN(nodeIndex) && !isNaN(nodeTotal)) {
               if (nodeIndex === nodeTotal - 1) {
-                mergeStyles(ret, obj, node);
+                // debugger
+                mergeStyles(ret, computedStyle, obj, node);
               }
               return;
 
             } else {
               let lengthM1 = isNaN(nodeTotal) ? `${nodeTotal} - 1` : nodeTotal - 1;
               condition = `${nodeIndex} === ${lengthM1}`;
+              conditionObj = new javascript.astFactory.BinaryExpression(
+                "===",
+                new javascript.astFactory.Identifier(nodeIndex),
+                isNaN(nodeTotal) ? javascript.parse(`${nodeTotal} - 1`).body[0].expression: new javascript.astFactory.Literal(nodeTotal - 1),
+              )
             }
           } else if (obj.rule.startsWith('nth-child')) {
               
@@ -1857,31 +1855,50 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                 let num = Number(childFunc);
                 if (_LiteralNodeIndex) {
                   if (_LiteralNodeIndex === num) {
-                    mergeStyles(ret, obj, node);
+                    mergeStyles(ret, computedStyle, obj, node);
                   }
                   return;
                 } else {
-                  condition = `${nodeIndex} === ${num - 1}`
+                  condition = `${nodeIndex} === ${num - 1}`;
+                  conditionObj = new javascript.astFactory.BinaryExpression(
+                    "===",
+                    new javascript.astFactory.Identifier(nodeIndex),
+                    new javascript.astFactory.Literal(num - 1),
+                  )
                 }
 
               } else if (childFunc === 'even') {
                 if (_LiteralNodeIndex) {
                   if (_LiteralNodeIndex & 1) {
-                    mergeStyles(ret, obj, node);
+                    mergeStyles(ret, computedStyle, obj, node);
                   }
                   return;
                 } else {
-                  condition = `${nodeIndex} & 1`
+                  condition = `${nodeIndex} & 1`;
+                  conditionObj = new javascript.astFactory.BinaryExpression(
+                    "&",
+                    new javascript.astFactory.Identifier(nodeIndex),
+                    new javascript.astFactory.Literal(1),
+                  )
                 }
 
               } else if (childFunc === 'even') {
                 if (_LiteralNodeIndex) {
                   if (!(_LiteralNodeIndex & 1)) {
-                    mergeStyles(ret, obj, node );
+                    mergeStyles(ret, computedStyle, obj, node );
                   }
                   return;
                 } else {
-                  condition = `!(${nodeIndex} & 1)`
+                  condition = `!(${nodeIndex} & 1)`;
+                  conditionObj = new javascript.astFactory.UnaryExpression(
+                    "!",
+                    new javascript.astFactory.BinaryExpression(
+                      "&",
+                      new javascript.astFactory.Identifier(nodeIndex),
+                      new javascript.astFactory.Literal(1),
+                    )
+                  )
+                  
                 }
               } else { //3n 3n+2
                 ASSERT(childFunc.match(/[\d]+n[\+]?[\d]*/))
@@ -1899,11 +1916,20 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   let mod = (_LiteralNodeIndex+1) % m;
 
                   if (mod === t) {
-                    mergeStyles(ret, obj, node);
+                    mergeStyles(ret, computedStyle, obj, node);
                   }
                   return
                 } else {
                   condition = `${nodeIndex+1} % ${m} === ${t}`
+                  conditionObj = new javascript.astFactory.BinaryExpression(
+                    "===",
+                    new javascript.astFactory.BinaryExpression(
+                      "%",
+                      new javascript.astFactory.BinaryExpression("+", new javascript.astFactory.Identifier(nodeIndex), new javascript.astFactory.Literal(1)),
+                      new javascript.astFactory.Literal(m),
+                    ),
+                    new javascript.astFactory.Literal(t),
+                  )
                 }
                 
               }
@@ -1916,42 +1942,21 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           }
 
 
-          ASSERT(condition)
+          ASSERT(condition && conditionObj)
           if (condition) {
             // debugger
-            mergeStyles(ret, obj, node, condition);
+            mergeStyles(ret, computedStyle, obj, node, condition, conditionObj);
 
           }
 
         }
       )
-      // debugger
-      
     }
-   
-
-    ret.forEach(
-      str => {
-        let strArray = str.split("(");
-        // debugger
-        let name = strArray[0].substr(1)
-        if (!computedStyle[name]) {
-          ASSERT(strArray.length === 2 && strArray[0][0] === '.');
-          try {
-            computedStyle[name] = eval("(" + strArray[1]);
-
-          } catch (e) {
-            ASSERT(false);
-          }
-        }
-      }
-    );
 
 
-    return ret;
   }
 
-  function mergeStyles(ret, obj, node, condi) {
+  function mergeStyles(cmds, computedStyle, obj, node, condi, condiObj) {
 
     let rule = obj.rule;
     if (obj.depth) {
@@ -1963,60 +1968,86 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
     obj.str.forEach(
       str => {
-        mergeStyle(ret, str, rule, condi);
         let strArray = str.split("(");
         ASSERT(strArray.length === 2 && strArray[0][0] === '.');
-        node.computedStyle[strArray[0].substr(1)] = "*";
+
+        mergeStyle(cmds, computedStyle, str, rule, condi, condiObj);
+
       }
     );
   }
 
-  function mergeStyle(ret, str, rule, condi) {
+  function mergeStyle(cmds, computedStyle, str, rule, condi, condiObj) {
     // debugger
     let strArray = str.split("(");
     ASSERT(strArray.length === 2 && strArray[0][0] === '.');
     // debugger
     let name = strArray[0];
     
-    let info = ret.find(v => v.startsWith(name));
+    let info = cmds.find(v => v.startsWith(name));
     let properyKey = name.substr(1);
     let value = strArray[1].slice(0, -1);
 
     if (!info) {
       if (condi) {
         // debugger
-        ret.push(`.${properyKey}((${condi}) ? ${value} : undefined/*${rule}*/)`)
+
+        
+        cmds.push(`.${properyKey}((${condi}) ? ${value} : undefined/*${rule}*/)`);
+        computedStyle[properyKey] = new javascript.astFactory.ConditionalExpression(
+          condiObj,
+          valueToAst(value),
+          new javascript.astFactory.Literal(undefined),
+        )
       } else {
-        ret.push(str.slice(0, -1) + `/*${rule}*/)`)
+        if (value !== 'undefined') {
+          //default
+          cmds.push(str.slice(0, -1) + `/*${rule}*/)`)
+          computedStyle[properyKey] = valueToAst(value);
+          // debugger
+        }
       }
     } else {
-      
-      let vIndex = ret.indexOf(info);
+      let vIndex = cmds.indexOf(info);
       let kIndex = info.indexOf("(");
       let oldValue = info.slice(kIndex+1, -1);
+      let oldValueObj = computedStyle[properyKey];
+
       let newValue;
+      let newValueObj;
       let mergedValue;
+
       let strArray = str.split("(");
       ASSERT(strArray.length === 2 && strArray[0][0] === '.');
 
       let objMode =["margin", "padding", "borderRadius", "borderWidth", "borderStyle","borderColor",].includes(properyKey);
-
-      
-
       // debugger
 
       if (oldValue.includes("{")) {
+        
+
         ASSERT(objMode);
+        ASSERT(typeof oldValueObj === 'object');
 
         if (condi) {
+          // debugger
           newValue = `(${condi}) ? ${value} : undefined/*${rule}*/`
+          newValueObj = new javascript.astFactory.ConditionalExpression(
+            condiObj,
+            valueToAst(value),
+            new javascript.astFactory.Literal(undefined)
+          );
         } else {
-          newValue = `${value}/*${rule}*/`
+          newValue = `${value}/*${rule}*/`;
+          newValueObj = valueToAst(value);
         }
 
         if (oldValue.startsWith("Object.assign")) {
+          // debugger
           ASSERT(oldValue[oldValue.length-1] === ')');
           mergedValue = oldValue.slice(0, -1) + ", " + newValue + ")";
+          ASSERT(oldValueObj.type === "CallExpression");
+          oldValueObj.arguments.push(newValueObj)
         } else {
 
           let canMergeObject = false;
@@ -2027,6 +2058,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           let r;
           let o = "1?"+value+":1"
           let oldCondtion;
+          let oldCondtionObj;
           let oldRule = "";
 
           if (oldValue.includes("/*")) {
@@ -2068,8 +2100,23 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             if (oKeys.filter(k => lKeys.includes(k) || rKeys.includes(k) ).length === 0
             && (!r || lKeys.filter(k => rKeys.includes(k)).length === 0) // 属性正交
             ) {
-              // debugger
+
               let mergeObj = {}
+              let mergeAstObj = {}
+
+              if (!oldValueObj.type) {
+                debugger
+                mergeAstObj = valueToAst(oldValueObj);
+              } else if (oldValueObj.type === 'ConditionalExpression') {
+                oldCondtionObj = oldValueObj.test
+                ASSERT(oldCondtionObj)
+                mergeAstObj = new javascript.astFactory.ObjectExpression(
+                  []
+                )
+              } else {
+                ASSERT(false);
+                mergeAstObj = oldValueObj
+              }
 
               lKeys.forEach(
                 key => {
@@ -2077,8 +2124,24 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
                   if (oldCondtion) {
                     mergeObj[key] = `${oldCondtion} ? ${v} : undefined${oldRule}`
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: new javascript.astFactory.ConditionalExpression(
+                          oldCondtionObj,
+                          valueToAst(v),
+                          new javascript.astFactory.Literal(undefined), 
+                        )
+                      }
+                    )
                   } else {
-                    mergeObj[key] = `${v}${oldRule}`
+                    mergeObj[key] = `${v}${oldRule}`;
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: valueToAst(v),
+                      }
+                    )
                   }
                 }
               )
@@ -2089,8 +2152,25 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   let v = typeof r[key] === 'string' ? JSON.stringify(r[key]) : r[key];
                   if (oldCondtion) {
                     mergeObj[key] = `(!${oldCondtion}) ? ${v} : undefined${oldRule}`
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: new javascript.astFactory.ConditionalExpression(
+                          oldCondtionObj,
+                          new javascript.astFactory.Literal(undefined), 
+                          valueToAst(v),
+                        )
+                      }
+                    )
                   } else {
-                    mergeObj[key] = `${v}${oldRule}`
+                    ASSERT(false)
+                    mergeObj[key] = `${v}${oldRule}`;
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: valueToAst(v),
+                      }
+                    )
                   }
                 }
               )
@@ -2100,16 +2180,33 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                   let v = typeof o[key] === 'string' ? JSON.stringify(o[key]) : o[key];
 
                   if (condi) {
+                    // debugger
                     mergeObj[key] = `(${condi}) ? ${v} : undefined/*${rule}*/`
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: new javascript.astFactory.ConditionalExpression(
+                          condiObj,
+                          valueToAst(v),
+                          new javascript.astFactory.Literal(undefined), 
+                        )
+                      }
+                    )
                   } else {
                     mergeObj[key] = `${v}/*${rule}*/`
+                    mergeAstObj.properties.push(
+                      {
+                        key: new javascript.astFactory.Literal(key),
+                        value: valueToAst(v),
+                      }
+                    )
                   }
                 }
               );
 
               ASSERT(Object.keys(mergeObj).length === lKeys.length + rKeys.length + oKeys.length)
-
               mergedValue = "{" + Object.keys(mergeObj).map(key => key + ":" + mergeObj[key]).join(", ") + "}"
+              computedStyle[properyKey] = mergeAstObj;
             } else {
               canMergeObject = false;
             }
@@ -2119,40 +2216,121 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
 
           if (!canMergeObject) {
-            if (oldValue[0] = ("{")) {
+            // debugger
 
+            if (oldValue[0] = ("{")) {
+              
             } else {
+              debugger
               oldValue = "{}, " + oldValue
             }
   
-            mergedValue = "Object.assign(" + oldValue + ", " + newValue + ")"
+            mergedValue = "Object.assign(" + oldValue + ", " + newValue + ")";
+            let mergeAstObj;
+            // debugger
+            if (!oldValueObj.type) {
+              mergeAstObj = valueToAst(oldValueObj)
+            } else {
+              mergeAstObj = oldValueObj
+            }
+
+            let args = [mergeAstObj];
+            if (mergeAstObj.type !== "ObjectExpression") {
+              args.unshift(new javascript.astFactory.ObjectExpression([]));
+            }
+            ASSERT(newValueObj)
+            args.push(newValueObj);
+
+            mergeAstObj = new javascript.astFactory.CallExpression(
+              new javascript.astFactory.MemberExpression(
+                new javascript.astFactory.Identifier('Object'),
+                new javascript.astFactory.Identifier('assign'),
+              ),
+              args
+            )
+
+            computedStyle[properyKey] = mergeAstObj;
+
           }
-
-          
-
         }
 
-        ret[vIndex] = (`.${properyKey}(${mergedValue})`);
+        cmds[vIndex] = (`.${properyKey}(${mergedValue})`);
 
 
       } else {
+        debugger
         ASSERT(!objMode)
 
         if (condi) {
           newValue = `(${condi}) ? ${value} : ${oldValue}/*${rule}*/`
+          newValueObj = new javascript.astFactory.ConditionalExpression(
+            condiObj,
+            valueToAst(value),
+            new javascript.astFactory.Literal(undefined)
+          );
         } else {
-          newValue = `${value}/*${rule}*/`
+          newValue = `${value}/*${rule}*/`;
+          newValueObj = typeof value === 'string' ? value : valueToAst(value);
         }
-        ret[vIndex] = (`.${properyKey}(${newValue})`);
+        cmds[vIndex] = (`.${properyKey}(${newValue})`);
+        computedStyle[properyKey] = newValueObj;
 
       }
 
       // debugger
     }
+    
+  }
+
+  function valueToAst(value) {
+
+    if (typeof value === 'object') {
+      if (value.type) {
+        return value
+      } else {
+        return new javascript.astFactory.ObjectExpression(
+          Object.keys(value).map(key => ({key: new javascript.astFactory.Literal(key), value: new javascript.astFactory.Literal(value[key])}))
+        )
+      }
+    } else {
+
+      if (typeof value === "number") {
+        return new javascript.astFactory.Literal(value);
+
+      } else if (typeof value === "string") {
+        // debugger
+        if (value.startsWith("0x")) {
+          value = eval(value);
+          return new javascript.astFactory.Literal(value);
+
+        } else {
+          try {
+            value = JSON.parse(value);
+            if (typeof value === 'object')
+              return  valueToAst(value);
+            else 
+              return new javascript.astFactory.Literal(value);
+          } catch (e) {
+            debugger
+            return javascript.parse(value).body[0].expression;
+          }
+        }
+      } else {
+        ASSERT(false)
+      }
+
+
+    }
+
   }
 
   // nerver use physics
   function plusPixel(l, r) {
+
+    if (typeof l === 'object' || typeof r === 'object') {
+      debugger
+      ASSERT(false, 'not support yet')
+    }
 
     if (l == 0) return r;
     else if (r == 0) return l;
@@ -2160,13 +2338,51 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (l.endsWith("lpx")) {
       if (r.endsWith("lpx"))
         return parseFloat(l) + parseFloat(r) + "lpx"
-      else if (r.endsWith("vp") || r.endsWith("px"))
-        return parseFloat(l) + ` + vp2px(px2lpx(${r.slice(0, -2)}))` + ` + "lpx"`
+      else if (r.endsWith("vp") || r.endsWith("px")) {
+        return new javascript.astFactory.BinaryExpression(
+          "+",
+          new javascript.astFactory.BinaryExpression(
+            "+",
+            new javascript.astFactory.Literal(parseFloat(l)),
+            new javascript.astFactory.CallExpression(
+              new javascript.astFactory.Identifier("px2lpx"),
+              [
+                new javascript.astFactory.CallExpression(
+                  new javascript.astFactory.Identifier("vp2px"),
+                  [
+                    new javascript.astFactory.Literal(parseFloat(r)),
+                  ]
+                )
+              ]
+            ),
+          ),
+          new javascript.astFactory.Literal("lpx")
+        );
+      }
       else 
         ASSERT(false, 'not support plus pixel with differnt unit')
     } else if (l.endsWith("vp") || l.endsWith("px")) {
-      if (r.endsWith("lpx"))
-        return parseFloat(l) + ` + lpx2px(px2vp(${r.slice(0, -3)}))` + ` + "vp"`
+      if (r.endsWith("lpx")) {
+        return new javascript.astFactory.BinaryExpression(
+          "+",
+          new javascript.astFactory.BinaryExpression(
+            "+",
+            new javascript.astFactory.Literal(parseFloat(l)),
+            new javascript.astFactory.CallExpression(
+              new javascript.astFactory.Identifier("px2vp"),
+              [
+                new javascript.astFactory.CallExpression(
+                  new javascript.astFactory.Identifier("lpx2px"),
+                  [
+                    new javascript.astFactory.Literal(parseFloat(r)),
+                  ]
+                )
+              ]
+            ),
+          ),
+          new javascript.astFactory.Literal("vp")
+        );
+      }
       else if (r.endsWith("vp") ||r.endsWith("px"))
         return parseFloat(l) + parseFloat(r) + "vp"
       else 
@@ -2178,34 +2394,112 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     debugger
   }
 
-  function getExpandString(o) {
+  function getExpandString(o, key, computedStyle) {
+
+    let ret;
+    let tmpObj = {};
     if (o.hasOwnProperty("left")
       && o.left === o.right
       && o.left === o.top
       && o.left === o.bottom
       ) {
-        return o.left;
+        tmpObj[key] = {left: o.left, right: o.right, top: o.top, bottom: o.bottom, }
+        ret = o.left;
+        
     } else if (
       o.hasOwnProperty("topLeft")
       && o.topLeft === o.topRight
       && o.topLeft === o.bottomLeft
       && o.topLeft === o.bottomRight
     ) {
-      return o.topLeft;
+      tmpObj[key] = {topLeft: o.topLeft, topRight: o.topRight, bottomLeft: o.bottomLeft, bottomRight: o.bottomRight}
+      ret = o.topLeft;
     } else {
-        return "{" + [
-          o.hasOwnProperty('left') ? `left: ${o.left}` : 0,
-          o.hasOwnProperty('right') ? `right: ${o.right}` : 0,
-          o.hasOwnProperty('top') ? `top: ${o.top}` : 0,
-          o.hasOwnProperty('bottom') ? `bottom: ${o.bottom}` : 0,
+      tmpObj[key] = {}
+        o.hasOwnProperty('left') && (tmpObj[key].left = o.left);
+        o.hasOwnProperty('right') && (tmpObj[key].right = o.right);
+        o.hasOwnProperty('top') && (tmpObj[key].top = o.top);
+        o.hasOwnProperty('bottom') && (tmpObj[key].bottom = o.bottom);
 
-          o.hasOwnProperty('topLeft') ? `topLeft: ${o.topLeft}` : 0,
-          o.hasOwnProperty('topRight') ? `topRight: ${o.topRight}` : 0,
-          o.hasOwnProperty('bottomLeft') ? `bottomLeft: ${o.bottomLeft}` : 0,
-          o.hasOwnProperty('bottomRight') ? `bottomRight: ${o.bottomRight}` : 0,
+        o.hasOwnProperty('topLeft') && (tmpObj[key].topLeft = o.topLeft);
+        o.hasOwnProperty('topRight') && (tmpObj[key].topRight = o.topRight);
+        o.hasOwnProperty('bottomLeft') && (tmpObj[key].bottomLeft = o.bottomLeft);
+        o.hasOwnProperty('bottomRight') && (tmpObj[key].bottomRight = o.bottomRight);
+
+
+        ret = "{" + [
+          o.hasOwnProperty('left') ? `"left": ${o.left}` : 0,
+          o.hasOwnProperty('right') ? `"right": ${o.right}` : 0,
+          o.hasOwnProperty('top') ? `"top": ${o.top}` : 0,
+          o.hasOwnProperty('bottom') ? `"bottom": ${o.bottom}` : 0,
+
+          o.hasOwnProperty('topLeft') ? `"topLeft": ${o.topLeft}` : 0,
+          o.hasOwnProperty('topRight') ? `"topRight": ${o.topRight}` : 0,
+          o.hasOwnProperty('bottomLeft') ? `"bottomLeft": ${o.bottomLeft}` : 0,
+          o.hasOwnProperty('bottomRight') ? `"bottomRight": ${o.bottomRight}` : 0,
 
         ].filter(v=>v).join(", ") + "}"
       }
+
+      let distObj = new javascript.astFactory.ObjectExpression(
+        []
+      );
+
+      for (let p in tmpObj[key]) {
+        let v = tmpObj[key][p]
+        try {
+
+          if (typeof v === "number") {
+
+          } else if (typeof v === "string") {
+            if (v.startsWith("0x")) {
+              v = eval(v)
+            } else {
+              v = JSON.parse(v)
+            }
+          } 
+
+          tmpObj[key][p] = v;
+          distObj.properties.push(
+            {
+              key: new javascript.astFactory.Literal(p),
+              value: new javascript.astFactory.Literal(v),
+              
+            } 
+          );
+
+          Object.defineProperty(
+            distObj, p, {
+              value: v,
+              enumerable: false
+            }
+          )
+
+        } catch (e) {
+          // tmpObj[key][p] = `eval(${tmpObj[key][p]})`
+          // debugger
+          distObj.properties.push(
+            {
+              key: new javascript.astFactory.Literal(p),
+              value: javascript.parse(v).body[0].expression,
+              
+            } 
+          )
+
+          Object.defineProperty(
+            distObj, p, {
+              value: `eval(${v})`,
+              enumerable: false
+            }
+          )
+
+        }
+      }
+
+      computedStyle[key] = distObj
+      // debugger
+
+      return ret;
   }
 
   function convertFontWeight(_fontWeight) {
@@ -2275,7 +2569,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
       v = parseFloat(v.slice(0, -2)) / 100;
       if (v === 1)
         v = `SCREEN_HEIGHT`;
-      else if (v === 1)
+      else if (v === -1)
         v = `-SCREEN_HEIGHT`;
       else if (v === 0)
         v = 0;

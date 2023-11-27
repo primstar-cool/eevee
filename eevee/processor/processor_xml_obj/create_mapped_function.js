@@ -268,8 +268,10 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
 
 
             if (objCallee.type === 'Identifier'
-            && ["isNaN", "isFinite", "parseInt", "parseFloat", "Number"].includes(objCallee.name)) {
-                return objCallee.name
+            && ["isNaN", "isFinite", "parseInt", "parseFloat", "Number"
+                , "px2vp", "vp2px", "px2lpx", "lpx2px", 
+            ].includes(objCallee.name)) {
+                return objCallee.name;
             } 
             // else if (objCallee.type === 'MemberExpression'
             // && objCallee.object.type === 'Identifier'
@@ -297,7 +299,6 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
                         objectStr =  loopObjCallee.object.property.name + "." + objectStr
                         loopObjCallee = loopObjCallee.object;
                     }
-
 
 
                     if (loopObjCallee.object.type === 'Identifier') {
