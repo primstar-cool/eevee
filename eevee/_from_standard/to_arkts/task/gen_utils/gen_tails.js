@@ -375,7 +375,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
       }
     }
 
-    if (node._convertedTagName === 'Text' || node._convertedTagName === 'Input' || appendTextStyle ) {
+    if (node._convertedTagName === 'Text' || node._convertedTagName === 'TextInput' || appendTextStyle ) {
       // debugger
       if (!cmds.find(v=>v.startsWith(".textAlign"))) {
         let _textAlign = getInheritStyle(node, "textAlign");
@@ -403,7 +403,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         // debugger
       }
 
-      if (node._convertedTagName !== 'Input' && !cmds.find(v=>v.startsWith(".lineHeight"))) {
+      if (node._convertedTagName !== 'TextInput' && !cmds.find(v=>v.startsWith(".lineHeight"))) {
         
         let _lineHeight = getInheritStyle(node, "lineHeight");
         if (_lineHeight)
@@ -1243,7 +1243,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             computedStyle[nN] = v;
             // debugger
 
-            if (!(node._convertedTagName === 'Inpubt' && n_n === "line-height"))
+            if (!(node._convertedTagName === 'TextInput' && n_n === "line-height"))
               ret.push(`.${nN}(${convertLength(v)})`)
             
             break;
