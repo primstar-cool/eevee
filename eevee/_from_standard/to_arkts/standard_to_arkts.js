@@ -21,6 +21,7 @@ module.exports = function (node,
     rootSrcPath: undefined,
     mainClassName: undefined,
     resolveAssetsPathFn: undefined, // function mapping local assets path (wxmp)
+    judgeMergeRichTextFn: undefined, // check when make inline texts
     getIncludedStandardTreeFn: undefined, // function how to get include tree, if stardtree does not  containe external-include tree.
     getImportedStyleContentFn: undefined,
 
@@ -150,8 +151,6 @@ module.exports = function (node,
       v => {
         let hashKey = JSON.stringify(v);
 
-
-
         if (!ruleDict[hashKey]) {
           ruleDict[hashKey] = 1;
           allRulesUnDup.push(v);
@@ -182,6 +181,7 @@ module.exports = function (node,
       cssDomain,
       getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
       resolveAssetsPathFn: config.resolveAssetsPathFn,
+      judgeMergeRichTextFn: config.judgeMergeRichTextFn  || _judgeMergeRichTextFn,
       enableIterObject: config.enableIterObject
     }
   );
@@ -207,3 +207,32 @@ function _getIncludedStandardTree(node , src) {
   return node.includedContent;
 }   
 
+function _judgeMergeRichTextFn(nodeInfos, mergeFunc) {
+
+  let mergeArr = [];
+
+  for (let i = 0; i < nodeInfos; i++) {
+    let v = nodeInfo[i];
+    if (
+      v.node._convertedTagName === 'Text' &&
+      (v.node.computedStyle.display === "inline" || v.node.computedStyle.display === "inline-block")
+      // && v.node.attrs.className.includes("rich-text") // shoule mark it by project specification
+ 
+    ) { 
+      mergeArr.push(v);
+    } else {
+      if (mergeArr.length >= 3) { // modify it as you wish
+        mergeFunc(mergeArr);
+      }        
+      mergeArr =[];
+
+    }
+
+    if (mergeArr.length >= 3) { // modify it as you wish
+      mergeFunc(mergeArr);
+    }        
+    mergeArr =[];
+
+  }
+
+}

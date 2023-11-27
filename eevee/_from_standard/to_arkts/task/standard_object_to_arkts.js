@@ -27,6 +27,7 @@ module.exports = function standard2arkts(
       onFoundImportTemplateFn,
       onFoundEventHandlerFn,
       resolveAssetsPathFn,
+      judgeMergeRichTextFn,
       cssDomain,
       enableIterObject
     } = {}
@@ -84,7 +85,7 @@ module.exports = function standard2arkts(
     root._uuid = JSON.stringify(root.tagName)
     root.childNodes.forEach(
       (node, idx) => {
-          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn}}).trim();
+          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeMergeRichTextFn}}).trim();
           dest += (root.childNodes.length > 1 ? '\n' : '\n');
       }
     )
@@ -228,6 +229,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       //   styleAttr = parentAttrInfo.substring(startIndex + 7, endIndex);
       // } 
 
+      node._convertedTagName = "Text";
       let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
       let tailsStr = tails.cmds.join(``);
       ret = indent + (`Text(${genParams(node, "Text", functionArray, styleHolder, cssDomain, sourceType, fns)})${tailsStr}` + "\n");
@@ -445,12 +447,9 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           }
 
           if (numInline === node.childNodes.length) {
-
-            
-
             if (numInline <= 3 && !hasFor) {
               destClassTagName = 'Row';
-            } 
+            }
             // debugger
             // node._textAlign = cssClassStyle["text-align"];
           } else {
