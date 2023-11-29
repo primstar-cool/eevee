@@ -33,7 +33,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     ASSERT(node.computedStyle);
 
     if (cssClassNames.length === 0) {
-      return {cmds:[]};
+      cmds = [];
     } else if (cssClassNames.length === 1) {
       cssClassStyle = classDict[cssClassNames[0]];
 

@@ -14,6 +14,8 @@ const getInheritStyle = require("../../helpers/get_inherit_style.js");
 
 const getObjectDataExpression = require("../../../exporter/string_utils/get_object_data_expression.js");
 const genForFunction = require("./gen_utils/gen_for_function.js");
+const genRichTextNode = require("./gen_utils/gen_rich_text_node.js");
+
 let defaultFlexDisplay; 
 
 module.exports = function standard2arkts(
@@ -27,6 +29,7 @@ module.exports = function standard2arkts(
       onFoundImportTemplateFn,
       onFoundEventHandlerFn,
       resolveAssetsPathFn,
+      judgeMergeRichTextFn,
       cssDomain,
       enableIterObject
     } = {}
@@ -84,7 +87,7 @@ module.exports = function standard2arkts(
     root._uuid = JSON.stringify(root.tagName)
     root.childNodes.forEach(
       (node, idx) => {
-          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn}}).trim();
+          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeMergeRichTextFn}}).trim();
           dest += (root.childNodes.length > 1 ? '\n' : '\n');
       }
     )
@@ -168,14 +171,15 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
   // debugger
   if (!node.tagName) {
 
+    
     let dataString = genDataString(node.data, functionArray);
     if (dataString === null) return "";
 
     if (dataString.startsWith("/*")) {
       ret = indent + `${dataString}\n`
     } else {
-
-      node.computedStyle.display = 'inline'
+      // debugger
+      node.computedStyle.display = 'inline-block'
       node.isAutoCreateTextNode = 1;
       ASSERT(node.parentNode.tagName !== 'text' && node.parentNode.tagName !== 'span', 'not support multi untag text yet');
       ASSERT(parentStyleString && !node.attrs && Object.keys(node.logic||{}).length <= 1);
@@ -228,6 +232,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       //   styleAttr = parentAttrInfo.substring(startIndex + 7, endIndex);
       // } 
 
+      node._convertedTagName = "Text";
       let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
       let tailsStr = tails.cmds.join(``);
       ret = indent + (`Text(${genParams(node, "Text", functionArray, styleHolder, cssDomain, sourceType, fns)})${tailsStr}` + "\n");
@@ -392,7 +397,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           let numBlock = 0;
           let hasFor = 0;
 
-          node._isAllTextChildren = !node.childNodes.filter(sn => !(sn.tagName === 'text' || sn.tagName === 'span' || !sn.tagName)).length
+          // node._isAllTextChildren = !node.childNodes.filter(sn => !(sn.tagName === 'text' || sn.tagName === 'span' || !sn.tagName)).length
 
           for (let j = 0; j < node.childNodes.length; j++) {
             let subNode = node.childNodes[j];
@@ -445,12 +450,9 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           }
 
           if (numInline === node.childNodes.length) {
-
-            
-
             if (numInline <= 3 && !hasFor) {
               destClassTagName = 'Row';
-            } 
+            }
             // debugger
             // node._textAlign = cssClassStyle["text-align"];
           } else {
@@ -647,6 +649,8 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         }
       }
       
+
+      
       let childNodesStringObj = node.childNodes.map(
         n => {
           let str = genSubNodeString(n, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: depth + indentSubDepth, styleHolder, cssDomain, enableIterObject, fns})
@@ -658,6 +662,32 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         }
       )
         
+
+      // debugger
+      if (fns.judgeMergeRichTextFn) {
+        // debugger
+        fns.judgeMergeRichTextFn(childNodesStringObj, 
+          (mergeNodes) => {
+
+            // debugger;
+
+            let minIndexArr = childNodesStringObj.filter(v=>mergeNodes.includes(v)).map( v => childNodesStringObj.indexOf(v))
+            let minIndex = Math.min.call(null, ...minIndexArr);
+
+            let richTextNode = genRichTextNode(mergeNodes, functionArray);
+
+            childNodesStringObj.splice(minIndex, 0, {
+              str: genIndent(depth + indentSubDepth) + richTextNode.str.replace(/\n/g, `\n${genIndent(depth + indentSubDepth)}`),
+              node: richTextNode.node
+            });
+
+
+
+            childNodesStringObj = childNodesStringObj.filter(v=>!mergeNodes.includes(v));
+          }
+        );
+      }
+
       // if (node.attrs?.id === "aaa") debugger
 
       if (node._convertedTagName === 'Column') {

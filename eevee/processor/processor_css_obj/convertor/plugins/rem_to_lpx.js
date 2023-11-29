@@ -18,7 +18,13 @@ module.exports = (screenWidthRem = 7.5, hapDesignWidth = 720) => {
             if (hapDesignWidth/screenWidthRem === Math.floor(hapDesignWidth/screenWidthRem)) 
               return r * (hapDesignWidth/screenWidthRem) + 'lpx'
 
-            return Math.round(hapDesignWidth * 8192 * r / screenWidthRem) / 8192 + 'lpx';
+            let v = "" + (hapDesignWidth * r / screenWidthRem);
+            if (v.length - v.indexOf(".") > 9) {
+              return Math.round(hapDesignWidth * 8192 * r / screenWidthRem) / 8192 + 'lpx';
+            } else {
+              return v + "lpx"
+            }
+
           });
         }
       }

@@ -190,7 +190,7 @@ module.exports = function genParams(node, destClassTagName, functionArray, style
     
     const uuidString = getNodeUUID(node, functionArray);
     if (uuidString[0] === "\"") {
-      ret += '/*uuid=' + uuidString + "*/ ";
+      ret += '/*uuid=' + uuidString + "*/";
       node._uuid = uuidString;
     } else {
       ret += '/*uuid={' + uuidString.trim() + '}*/';

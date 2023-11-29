@@ -22,8 +22,12 @@ module.exports = (hapDesignWidth = 720) => {
                 return r + "lpx"
               } 
 
-              return Math.round(hapDesignWidth * 8192 * r / 750 ) / 8192 + 'lpx';  // fixed(2)
-              
+              let v = "" + (hapDesignWidth * r / 750);
+              if (v.length - v.indexOf(".") > 9) {
+                return Math.round(hapDesignWidth * 8192 * r / 750 ) / 8192 + 'lpx';  // fixed(2)
+              } else {
+                return v + "lpx"
+              }
             }
           });
         }
