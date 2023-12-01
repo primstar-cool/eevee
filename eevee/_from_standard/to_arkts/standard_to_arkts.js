@@ -21,7 +21,7 @@ module.exports = function (node,
     rootSrcPath: undefined,
     mainClassName: undefined,
     resolveAssetsPathFn: undefined, // function mapping local assets path (wxmp)
-    judgeMergeRichTextFn: undefined, // check when make inline texts
+    judgeWrapTextFn: undefined, // check when make inline texts
     getIncludedStandardTreeFn: undefined, // function how to get include tree, if stardtree does not  containe external-include tree.
     getImportedStyleContentFn: undefined,
 
@@ -181,7 +181,7 @@ module.exports = function (node,
       cssDomain,
       getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
       resolveAssetsPathFn: config.resolveAssetsPathFn,
-      judgeMergeRichTextFn: config.judgeMergeRichTextFn  || _judgeMergeRichTextFn,
+      judgeWrapTextFn: config.judgeWrapTextFn  || _judgeWrapTextFn,
       enableIterObject: config.enableIterObject
     }
   );
@@ -207,11 +207,11 @@ function _getIncludedStandardTree(node , src) {
   return node.includedContent;
 }   
 
-function _judgeMergeRichTextFn(nodeInfos, mergeFunc) {
+function _judgeWrapTextFn(nodeInfos, mergeFunc) {
 
   let mergeArr = [];
 
-  if (nodeInfos.length < 3) return;
+  if (nodeInfos.length < 2) return;
 
   for (let i = 0; i < nodeInfos.length; i++) {
     let v = nodeInfos[i];
@@ -224,7 +224,7 @@ function _judgeMergeRichTextFn(nodeInfos, mergeFunc) {
       // debugger
       mergeArr.push(v);
     } else {
-      if (mergeArr.length >= 3) { // modify it as you wish
+      if (mergeArr.length >= 2) { // modify it as you wish
         mergeFunc(mergeArr);
       }        
       mergeFunc = null;

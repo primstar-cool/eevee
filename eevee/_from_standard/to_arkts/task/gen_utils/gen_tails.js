@@ -1711,8 +1711,23 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             let maxWidth = computedStyle.maxWidth;
   
             if (minHeight || maxHeight || minWidth || maxWidth) {
-              ASSERT(!Object.keys(paddingObjectE).filter(k => paddingObjectE(k).startsWith("eval")).length, 'content-box must has a certain padding')
-            
+              debugger
+              ASSERT(paddingObjectE.type === 'ObjectExpression' && !paddingObjectE.properties.filter(o => o.value.type !== 'Literal').length, 'content-box must has a certain padding')
+              
+              
+              let mergeLR;
+              
+              if (minWidth || maxWidth) {
+                
+                mergeLR = plusPixel(paddingObjectE.left || 0, paddingObjectE.right || 0);
+              }
+
+              let mergeTB;
+              if (minHeight || maxHeight) {
+                mergeTB = plusPixel(paddingObjectE.top || 0, paddingObjectE.bottom || 0);
+
+              }
+
               if (mergeLR) mergeLR = "-" + mergeLR; //padding always > 0
               if (mergeTB) mergeTB = "-" + mergeTB; //padding always > 0
               if (minHeight !== undefined) {
@@ -2568,13 +2583,13 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (v.endsWith("vh")) {
       v = parseFloat(v.slice(0, -2)) / 100;
       if (v === 1)
-        v = `SCREEN_HEIGHT`;
+        v = `Device.height`;
       else if (v === -1)
-        v = `-SCREEN_HEIGHT`;
+        v = `-Device.height`;
       else if (v === 0)
         v = 0;
       else 
-        v = `${v} * SCREEN_HEIGHT`;
+        v = `${v} * Device.height`;
     } else if (v.endsWith("lpx")) {
       v = `"${v}"`
     } else if (v.endsWith("px")) {
@@ -2582,6 +2597,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     } else {
       v = `"${v}"`
     }
-    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`vp"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`SCREEN_HEIGHT`));
+    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`vp"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`Device.height`));
     return v
   }

@@ -14,7 +14,7 @@ const getInheritStyle = require("../../helpers/get_inherit_style.js");
 
 const getObjectDataExpression = require("../../../exporter/string_utils/get_object_data_expression.js");
 const genForFunction = require("./gen_utils/gen_for_function.js");
-const genRichTextNode = require("./gen_utils/gen_rich_text_node.js");
+const genWrapTextNode = require("./gen_utils/gen_wrap_text_node.js");
 
 let defaultFlexDisplay; 
 
@@ -29,7 +29,7 @@ module.exports = function standard2arkts(
       onFoundImportTemplateFn,
       onFoundEventHandlerFn,
       resolveAssetsPathFn,
-      judgeMergeRichTextFn,
+      judgeWrapTextFn,
       cssDomain,
       enableIterObject
     } = {}
@@ -87,7 +87,7 @@ module.exports = function standard2arkts(
     root._uuid = JSON.stringify(root.tagName)
     root.childNodes.forEach(
       (node, idx) => {
-          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeMergeRichTextFn}}).trim();
+          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeWrapTextFn}}).trim();
           dest += (root.childNodes.length > 1 ? '\n' : '\n');
       }
     )
@@ -155,12 +155,13 @@ module.exports = function standard2arkts(
 
 }
 
-function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth, styleHolder, cssDomain, ignoreMyNodeLogic = false, enableIterObject, fns}) {
+function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth, styleHolder, cssDomain, ignoreMyNodeLogic = false, enableIterObject, fns, detailMode = false}) {
   
   let indent = genIndent(depth);
   let indent_1 = indent + genIndent(1);
   let indent_2 = indent_1 + genIndent(1);
-
+  let tails = undefined;
+  let ret;
 
   let parentStyleString;
   ASSERT(node.parentNode.style && node.parentNode.style._tmpStyleId >= 0);
@@ -173,7 +174,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
 
     
     let dataString = genDataString(node.data, functionArray);
-    if (dataString === null) return "";
+    if (dataString === null) return detailMode ? {text:"", tails} : "";
 
     if (dataString.startsWith("/*")) {
       ret = indent + `${dataString}\n`
@@ -183,63 +184,15 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       node.isAutoCreateTextNode = 1;
       ASSERT(node.parentNode.tagName !== 'text' && node.parentNode.tagName !== 'span', 'not support multi untag text yet');
       ASSERT(parentStyleString && !node.attrs && Object.keys(node.logic||{}).length <= 1);
-      // style={backgroundColor:transparent;padding:0;margin:0},
-
-      // let parentAttrInfo = genAttrs(node.parentNode, functionArray, styleHolder, cssDomain, sourceType);
-
-      // let classAttr = "";
-      // if (parentAttrInfo.includes(`className="`)) {
-      //   let startIndex = parentAttrInfo.indexOf(`className="`)
-      //   classAttr = parentAttrInfo.substring(startIndex, parentAttrInfo.indexOf(`"`, startIndex + 11) + 1);
-      // } else if (parentAttrInfo.includes(`className={`)) {
-      //   let startIndex = parentAttrInfo.indexOf(`className={`);
-      //   let endIndex;
-      //   let num = 1;
-      //   for (let ii = startIndex + 11; ii < parentAttrInfo.length; ii++) {
-      //     let c = parentAttrInfop[ii];
-      //     if (c === "{") num++;
-      //     if (c === "}") {
-      //       num--;
-      //       if (num === 0) {
-      //         endIndex = ii+1;
-      //         break;
-      //       }
-      //     }
-      //   }
-      //   classAttr = parentAttrInfo.substring(startIndex, endIndex);
-      // } 
-
-      // let styleAttr = "";
-      // if (parentAttrInfo.includes(`style="`)) {
-      //   let startIndex = parentAttrInfo.indexOf(`style="`)
-      //   styleAttr = parentAttrInfo.substring(startIndex, parentAttrInfo.indexOf(`"`, startIndex + 7));
-      //   styleAttr = JSON.parse(styleAttr);
-      // } else if (parentAttrInfo.includes(`style={`)) {
-      //   let startIndex = parentAttrInfo.indexOf(`style={`);
-      //   let endIndex;
-      //   let num = 1;
-      //   for (let ii = startIndex + 7; ii < parentAttrInfo.length; ii++) {
-      //     let c = parentAttrInfop[ii];
-      //     if (c === "{") num++;
-      //     if (c === "}") {
-      //       num--;
-      //       if (num === 0) {
-      //         endIndex = ii;
-      //         break;
-      //       }
-      //     }
-      //   }
-      //   styleAttr = parentAttrInfo.substring(startIndex + 7, endIndex);
-      // } 
 
       node._convertedTagName = "Text";
-      let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
+      tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
       let tailsStr = tails.cmds.join(``);
       ret = indent + (`Text(${genParams(node, "Text", functionArray, styleHolder, cssDomain, sourceType, fns)})${tailsStr}` + "\n");
       ASSERT(!tails.extraIf)
     }
-    return ret;
-  } else {
+    return detailMode ? {text:ret, tails} : ret;
+  } else { //has tag name
 
     if (!node.attrs) node.attrs = {};
 
@@ -256,7 +209,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         var retForString = indent + `${forRet.replace(/\n/g, "\n" + indent)}\n`
 
         ASSERT(node.style)
-        return retForString;
+        return  detailMode ? {text:retForString, tails: undefined} : retForString;
       }
 
       
@@ -297,7 +250,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       }
     }
     
-    let destClassTagName = node._convertedTagName || {
+    var destClassTagName = node._convertedTagName || {
       view: "Flex",
       text: "Text",
       image: "Image",
@@ -326,7 +279,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
     genNodeCssXPathName(node, functionArray, styleHolder);
     let classDict = require("../../helpers/gen_all_possible_style.js")(Object.assign({}, node, { childNodes: null }), cssDomain, false, true);
     let allClassNames = Object.keys(classDict)
-    let cssClassStyle = {};
+    var cssClassStyle = {};
     
     if (allClassNames.length) {
       if (allClassNames.length === 1) {
@@ -348,128 +301,12 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
     }
 
     if (destClassTagName === "Text") {
-      // genAttrs(node, functionArray, styleHolder, cssDomain, sourceType);
       node.computedStyle.display = cssClassStyle.display || 'inline';
       ASSERT(typeof node.computedStyle.display === 'string');
 
     } else if (destClassTagName === "Flex") {
       // debugger
-
-      // if (node.childNodes && node.childNodes[0].tagName === "text") {
-      //   debugger
-      // }
-
-
-      node._isFlex = false;
-      if (cssClassStyle.display === 'flex' // 弹性布局
-        || defaultFlexDisplay
-      ) {
-        node._isFlex = true;
-        node.computedStyle.display = 'inline-block';//flex = _isFlex && display = 'inline-block';
-
-        if (cssClassStyle["flex-direction"] === "column" || cssClassStyle["flex-direction"] === "column-reverse") {
-          destClassTagName = 'Column';
-        } else {
-          destClassTagName = 'Row';
-        }
-      } else {
-
-        if (node.tagName === 'page' || node.tagName === 'body') {
-          // destClassTagName = 'Flex';
-        } else if (!node.childNodes || !node.childNodes.length) {
-          destClassTagName = 'Row';
-        } else {
-          // if (node.attrs?.id === 'aaa') debugger
-
-          if (cssClassStyle.display) {
-            node.computedStyle.display = cssClassStyle.display
-          } else {
-            if (node.tagName === 'text' || node.tagName === 'span'|| node.tagName === 'input') {
-              node.computedStyle.display = 'inline'
-            } else if (node.tagName === 'img' || node.tagName === 'image') {
-              node.computedStyle.display = 'inline-block'
-            } else {
-              node.computedStyle.display = 'block';
-            }
-          }
-
-          let numInline = 0;
-          let numBlock = 0;
-          let hasFor = 0;
-
-          // node._isAllTextChildren = !node.childNodes.filter(sn => !(sn.tagName === 'text' || sn.tagName === 'span' || !sn.tagName)).length
-
-          for (let j = 0; j < node.childNodes.length; j++) {
-            let subNode = node.childNodes[j];
-            if (subNode.computedStyle) subNode.computedStyle = {};
-
-            genNodeCssXPathName(subNode, functionArray, styleHolder);
-            let classDict = require("../../helpers/gen_all_possible_style.js")(Object.assign({}, subNode, { childNodes: null }), cssDomain, false, true);
-            let allClassNames = Object.keys(classDict);
-            let subDisplay = undefined;
-
-            allClassNames.forEach(
-              n => {
-                if (classDict[n].display) {
-                  if (!subDisplay) subDisplay = classDict[n].display;
-                  else {
-                    ASSERT(subDisplay === classDict[n].display, 'unsupport un flex mode with dynamic display');
-                  }
-                }
-              }
-            );
-
-            if (subDisplay === undefined) {
-              if (subNode.tagName === 'text' || subNode.tagName === 'span'|| subNode.tagName === 'input') {
-                subDisplay = 'inline'
-              } else if (subNode.tagName === 'img' || subNode.tagName === 'image') {
-                subDisplay = 'inline-block'
-              } else {
-                subDisplay = 'block';
-              }
-            }
-
-            subNode.computedStyle = subDisplay;
-
-            if (subDisplay !== "block" 
-                && subNode.tagName === 'text' && subNode.childNodes
-                && subNode.childNodes[0]
-                && subNode.childNodes[0].data 
-                && typeof subNode.childNodes[0].data === "string"
-                && subNode.childNodes[0].data.endsWith("\n")
-            ) {
-              subDisplay = 'block'; // will not use Row for it will cause a newline
-            }
-
-            if (subDisplay === 'block') {
-              numBlock++;
-            } else {
-              numInline++;
-            }
-            if (subNode.logic?.for) hasFor++;
-          }
-
-          if (numInline === node.childNodes.length) {
-            if (numInline <= 3 && !hasFor) {
-              destClassTagName = 'Row';
-            }
-            // debugger
-            // node._textAlign = cssClassStyle["text-align"];
-          } else {
-            if (numBlock === node.childNodes.length)
-              destClassTagName = 'Column';
-            else if (!hasFor && numBlock >=5 && numBlock / node.childNodes.length >= 0.8) //most is block
-              destClassTagName = 'Column';
-          }
-        }
-      }
-      
-      
-
-      // debugger
-      //genAttrs(node, functionArray, styleHolder, cssDomain, sourceType);
-      // var {bgNode} = require("./spec_hotfix/insert_bg_border_node.js")(node, cssDomain);
-      // debugger
+      _decideNodeConvertedTagNameFlex();
     }
 
     node._convertedTagName = destClassTagName;
@@ -484,23 +321,9 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
         debugger
         ASSERT(false, 'not support yet!')
         ASSERT(!ifString && !bgNode);
-        // let borderFlag = node.borderFlag;
-        // if (borderFlag)
-        //   ret = indent + `<View /*autoBorder="1"*/ style={getAutoBorderStyle(${parentStyleString}, 0)}>`
-        // if (borderFlag & 1)
-        //   ret += "\n" + indent + `  {${parentStyleString}.borderTopWidth    && <View /*autoBorder="1.1"*/ style={getAutoBorderStyle(${parentStyleString}, 1)}/>}`
-        // if (borderFlag & 2)
-        //   ret += "\n" + indent + `  {${parentStyleString}.borderRightWidth  && <View /*autoBorder="1.2"*/ style={getAutoBorderStyle(${parentStyleString}, 2)}/>}`
-        // if (borderFlag & 4)
-        //   ret += "\n" + indent + `  {${parentStyleString}.borderBottomWidth && <View /*autoBorder="1.4"*/ style={getAutoBorderStyle(${parentStyleString}, 4)}/>}`
-        // if (borderFlag & 8)
-        //   ret += "\n" + indent + `  {${parentStyleString}.borderLeftWidth   && <View /*autoBorder="1.8"*/ style={getAutoBorderStyle(${parentStyleString}, 8)}/>}`
-
-        // if (borderFlag)
-        //   ret += "\n" + indent + `</View>\n`
 
       } else {
-        let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType);
+        tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType);
         let tailsStr = tails.cmds.join(`\n${newLineIndent}`);
         let extraIf = tails.extraIf ? `if (${tails.extraIf}) ` : '';
         let elseCmdsStr = tails.elseCmds ? tails.elseCmds.join(`\n${newLineIndent}`) : null;
@@ -516,22 +339,12 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       }
 
       ASSERT(node.style)
-      return ret;
+      return detailMode ? {text:ret, tails} : ret;
 
     } else if (_isOnlyTextNode) {
-      // debugger
-      // let dataString = genDataString(node.childNodes[0].data, functionArray, true);
-      // if (dataString.startsWith("\"")) {
-      //   dataString = JSON.parse(dataString);
-      //   if (!encodeURIComponent(dataString) === dataString) { //no spec char
-      //     dataString = '{' + JSON.stringify(dataString) + '}'
-      //   }
-      // } else {
-      //   dataString = '{' + dataString + '}'
-      // }
-      // debugger
+      
 
-      let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
+      tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType, true);
     
       
       // if (node.attrs?.id === "bbb") debugger
@@ -548,8 +361,6 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
           };
         }
       }
-
-
 
       if (destClassTagName === 'Text') {
         // debugger
@@ -609,14 +420,12 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
   
       }
 
-      
-      return ret;
+      return detailMode ? {text:ret, tails} : ret;
     }
-    else {
+    else { //complext node
 
       let indentSubDepth = ifString ? 2 : 1;
-      let tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType)
-      
+      tails = genTails(node, functionArray, styleHolder, cssDomain, sourceType)
 
       if (!node._isFlex && node.computedStyle.display === 'block' && !node.parentNode._isFlex
       ) {
@@ -653,20 +462,21 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       
       let childNodesStringObj = node.childNodes.map(
         n => {
-          let str = genSubNodeString(n, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: depth + indentSubDepth, styleHolder, cssDomain, enableIterObject, fns})
+          let {text, tails} = genSubNodeString(n, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: depth + indentSubDepth, styleHolder, cssDomain, enableIterObject, fns, detailMode: true})
           // debugger
           return {
-            str: str,
-            node: n
+            str: text,
+            node: n,
+            tails: tails,
           }
         }
       )
         
 
       // debugger
-      if (fns.judgeMergeRichTextFn) {
+      if (fns.judgeWrapTextFn) {
         // debugger
-        fns.judgeMergeRichTextFn(childNodesStringObj, 
+        fns.judgeWrapTextFn(childNodesStringObj, 
           (mergeNodes) => {
 
             // debugger;
@@ -674,14 +484,12 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
             let minIndexArr = childNodesStringObj.filter(v=>mergeNodes.includes(v)).map( v => childNodesStringObj.indexOf(v))
             let minIndex = Math.min.call(null, ...minIndexArr);
 
-            let richTextNode = genRichTextNode(mergeNodes, functionArray);
+            let wrapTextNode = genWrapTextNode(mergeNodes, functionArray);
 
             childNodesStringObj.splice(minIndex, 0, {
-              str: genIndent(depth + indentSubDepth) + richTextNode.str.replace(/\n/g, `\n${genIndent(depth + indentSubDepth)}`),
-              node: richTextNode.node
+              str: genIndent(depth + indentSubDepth) + wrapTextNode.str.replace(/\n/g, `\n${genIndent(depth + indentSubDepth)}`),
+              node: wrapTextNode.node
             });
-
-
 
             childNodesStringObj = childNodesStringObj.filter(v=>!mergeNodes.includes(v));
           }
@@ -726,12 +534,11 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
 
       }
 
-      
       let innerChildrenNodeStr = childNodesStringObj.map(v=>v.str).join("").trim();
       let paramStr = genParams(node, destClassTagName, functionArray, styleHolder, cssDomain, sourceType, fns)
       if (!tails.elseCmds) {
         let tailsStr = tails.cmds.filter(t=>!isTextStyle(t)).join(`\n${newLineIndent}`);
-        var ret = 
+        ret = 
           `${indent}${ifString}${destClassTagName}(${paramStr}) {\n` + 
                 `${newLineIndent}${genIndent(1)}` +  innerChildrenNodeStr + "\n" + 
           `${newLineIndent}}${tailsStr}${ifStringEnd}\n`
@@ -761,13 +568,119 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       }
 
       
-      
       ASSERT(node.style);
 
       // if (node.className === "options-item-text") debugger
 
-      return ret;
+      return detailMode ? {text:ret, tails} : ret;
 
+    }
+  }
+
+
+  function _decideNodeConvertedTagNameFlex() {
+    node._isFlex = false;
+    if (cssClassStyle.display === 'flex' // 弹性布局
+      || defaultFlexDisplay
+    ) {
+      node._isFlex = true;
+      node.computedStyle.display = 'inline-block';//flex = _isFlex && display = 'inline-block';
+
+      if (cssClassStyle["flex-direction"] === "column" || cssClassStyle["flex-direction"] === "column-reverse") {
+        destClassTagName = 'Column';
+      } else {
+        destClassTagName = 'Row';
+      }
+    } else {
+
+      if (node.tagName === 'page' || node.tagName === 'body') {
+        // destClassTagName = 'Flex';
+      } else if (!node.childNodes || !node.childNodes.length) {
+        destClassTagName = 'Row';
+      } else {
+        // if (node.attrs?.id === 'aaa') debugger
+
+        if (cssClassStyle.display) {
+          node.computedStyle.display = cssClassStyle.display
+        } else {
+          if (node.tagName === 'text' || node.tagName === 'span'|| node.tagName === 'input') {
+            node.computedStyle.display = 'inline'
+          } else if (node.tagName === 'img' || node.tagName === 'image') {
+            node.computedStyle.display = 'inline-block'
+          } else {
+            node.computedStyle.display = 'block';
+          }
+        }
+
+        let numInline = 0;
+        let numBlock = 0;
+        let hasFor = 0;
+
+        // node._isAllTextChildren = !node.childNodes.filter(sn => !(sn.tagName === 'text' || sn.tagName === 'span' || !sn.tagName)).length
+
+        for (let j = 0; j < node.childNodes.length; j++) {
+          let subNode = node.childNodes[j];
+          if (subNode.computedStyle) subNode.computedStyle = {};
+
+          genNodeCssXPathName(subNode, functionArray, styleHolder);
+          let classDict = require("../../helpers/gen_all_possible_style.js")(Object.assign({}, subNode, { childNodes: null }), cssDomain, false, true);
+          let allClassNames = Object.keys(classDict);
+          let subDisplay = undefined;
+
+          allClassNames.forEach(
+            n => {
+              if (classDict[n].display) {
+                if (!subDisplay) subDisplay = classDict[n].display;
+                else {
+                  ASSERT(subDisplay === classDict[n].display, 'unsupport un flex mode with dynamic display');
+                }
+              }
+            }
+          );
+
+          if (subDisplay === undefined) {
+            if (subNode.tagName === 'text' || subNode.tagName === 'span'|| subNode.tagName === 'input') {
+              subDisplay = 'inline'
+            } else if (subNode.tagName === 'img' || subNode.tagName === 'image') {
+              subDisplay = 'inline-block'
+            } else {
+              subDisplay = 'block';
+            }
+          }
+
+          subNode.computedStyle = subDisplay;
+
+          if (subDisplay !== "block" 
+              && subNode.tagName === 'text' && subNode.childNodes
+              && subNode.childNodes[0]
+              && subNode.childNodes[0].data 
+              && typeof subNode.childNodes[0].data === "string"
+              && subNode.childNodes[0].data.endsWith("\n")
+          ) {
+            subDisplay = 'block'; // will not use Row for it will cause a newline
+          }
+
+          if (subDisplay === 'block') {
+            numBlock++;
+          } else {
+            numInline++;
+          }
+          if (subNode.logic?.for) hasFor++;
+        }
+
+        if (numInline === node.childNodes.length) {
+          if (numInline <= 3 && !hasFor) {
+            destClassTagName = 'Row';
+          }
+          // debugger
+          // node._textAlign = cssClassStyle["text-align"];
+        } else {
+          if (numBlock === node.childNodes.length)
+            destClassTagName = 'Column';
+          else if (!hasFor && numBlock >=5 && numBlock / node.childNodes.length >= 0.8) //most is block
+            destClassTagName = 'Column';
+        }
+      }
     }
   }
 
