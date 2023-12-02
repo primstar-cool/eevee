@@ -72,7 +72,7 @@ function tranversStyle(styleObj, tsAstNodeChildren, externalIgnores) {
     } else if (styleObj.type === 'MemberExpression')  {
 
         if (styleObj.object.type === 'Identifier'
-            && styleObj.object.name.startsWith("@EXTERNAL_SCOPE__") 
+            && styleObj.object.name.startsWith("$$EXTERNAL_SCOPE__") 
         ) {
             // debugger
 
@@ -81,7 +81,7 @@ function tranversStyle(styleObj, tsAstNodeChildren, externalIgnores) {
             let styleObjKey = styleObj.property.name;
 
 
-            let nameDefine = styleObj.object.name.substr(17);
+            let nameDefine = styleObj.object.name.substr(18);
 
             if (externalIgnores.includes(nameDefine)) return styleObj;
 
@@ -159,7 +159,7 @@ function tranversStyle(styleObj, tsAstNodeChildren, externalIgnores) {
     } else if (styleObj.type === 'CallExpression')  {
         if (styleObj.callee.type === 'MemberExpression'
         && styleObj.callee.object.type === 'Identifier'
-        && styleObj.callee.object.name === '@EXTERNAL_SCOPE__Object'
+        && styleObj.callee.object.name === '$$EXTERNAL_SCOPE__Object'
         && styleObj.callee.property.type === 'Identifier'
         && styleObj.callee.property.name === 'assign'
 
@@ -206,7 +206,7 @@ function mapTsNodeToAcorn(tsNodeSimple, isSingleValue = false) {
                     new javascript.astFactory.BinaryExpression(
                         "/",
                         new javascript.astFactory.MemberExpression(
-                            new javascript.astFactory.Identifier("@EXTERNAL_SCOPE__PCSEnvironment"),
+                            new javascript.astFactory.Identifier("$$EXTERNAL_SCOPE__PCSEnvironment"),
                             new javascript.astFactory.Identifier("deviceWidth"),   
                         ),
                         new javascript.astFactory.Literal(750)

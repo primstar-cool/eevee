@@ -44,16 +44,14 @@ module.exports = function (templateNode, transLocal, transMember, transExternalS
                 if (astObjLoop.type === 'Identifier') {
                   // console.log(astObjLoop.name)
     
-                  if (astObjLoop.name.startsWith("@LOCAL__")) {
+                  if (astObjLoop.name.startsWith("$$LOCAL__")) {
                     // debugger
                     transLocal && transLocal(astObjLoop, parent);
                     
-    
-                    
-                  } else if (astObjLoop.name.startsWith("@MEMBER__")) {
+                  } else if (astObjLoop.name.startsWith("$$MEMBER__")) {
                     // debugger
                     transMember && transMember(astObjLoop, parent);
-                  } else if (astObjLoop.name.startsWith("@EXTERNAL_SCOPE__")) {
+                  } else if (astObjLoop.name.startsWith("$$EXTERNAL_SCOPE__")) {
                     // debugger
                     transExternalScope && transExternalScope(astObjLoop, parent);
                   }

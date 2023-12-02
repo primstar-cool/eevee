@@ -39,7 +39,7 @@ module.exports = function genWrapTextNode(nodeInfos, functionArray) {
             },
         }
         let retStr;
-        if(0) //Text Span mode
+        if(1) //Text Span mode
         {
           let dumpSameInfo = {}
 

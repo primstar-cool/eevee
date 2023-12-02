@@ -3,6 +3,9 @@ const getNodeUUID = require("../../../helpers/get_node_uuid.js");
 const getObjectDataExpression = require("../../../../exporter/string_utils/get_object_data_expression.js");
 const createMappedFunction = require("../../../../processor/processor_xml_obj/create_mapped_function.js");
 const javascript = require('../../../../parser/parse_ast/javascript');
+const mustache = require('../../../helpers/mustache');
+
+
 const getInheritStyle = require("../../../helpers/get_inherit_style.js");
 const getExpressionWithForDomain = require("../../../helpers/get_expression_with_for_domain.js");
 
@@ -1073,9 +1076,19 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (typeof inlineStyle === 'string') {
       simplePlusArray = [inlineStyle];
     } else {
-      ASSERT(inlineStyle._orginalNode);
-      let ast = inlineStyle._orginalNode;
+      
+      // if (inlineStyle.type !== "MappedFunc") debugger
+
+      let ast = inlineStyle.type === "MappedFunc" ? inlineStyle._orginalNode : inlineStyle;
       // debugger
+      if (ast.type === 'CallExpression') {
+        debugger
+        ASSERT(fales, "not support yet");
+      }
+
+      ASSERT(ast && ast.type !== "MappedFunc");
+
+      
 
       let anaArr = [ast];
 
@@ -1217,6 +1230,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
         let nN = n_n.replace(/-[\w\W]/g, (v) => v[1].toUpperCase());
         let v = cssClassStyle[n_n];
+        let distVString;
+
         switch (n_n) {
           case "background-color": 
           case "color":
@@ -1236,15 +1251,31 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
           case "font-size":
           case "opacity": 
           case "line-height":
+
+
             if (inlineMode) {
-              try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              distVString = v;
+
+              try {
+                computedStyle[nN] = JSON.parse(v);
+
+              } catch (e) {
+                // debugger
+                computedStyle[nN] = javascript.parse(v).body[0].expression;
+                // ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )
+              }
+              
+
+
+            } else {
+              distVString = convertLength(v);
+              computedStyle[nN] = v;
             }
 
-            computedStyle[nN] = v;
             // debugger
 
             if (!(node._convertedTagName === 'TextInput' && n_n === "line-height"))
-              ret.push(`.${nN}(${convertLength(v)})`)
+              ret.push(`.${nN}(${distVString})`)
             
             break;
           case "z-index": 
@@ -1340,24 +1371,53 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "padding-right":
             case "padding-top":
             case "padding-bottom":
+
+              if (inlineMode) {
+                distVString = v;
+
+                try {
+                  v = JSON.parse(v);
+                  distVString = convertLength(v);
+                } catch (e) {
+                  // debugger
+                }
+
+              } else {
+                distVString = convertLength(v);
+              }
+
+              if (n_n.startsWith("padding") ){
+                paddingObject[n_n.substr(8)] = distVString;
+              } else if (n_n.startsWith("margin") ) {
+                marginObject[n_n.substr(7)] = distVString;
+              } 
+              break;
             case "border-left-width":
             case "border-right-width":
             case "border-top-width":
             case "border-bottom-width":
-              if (inlineMode) {
-                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
-              }
-              if (n_n.startsWith("padding") ){
-                paddingObject[n_n.substr(8)] = convertLength(v);
-              } else if (n_n.startsWith("margin") ) {
-                marginObject[n_n.substr(7)] = convertLength(v);
-              }  else if (n_n.startsWith("border-") ) {
-                if (v === 'thin') v = '"1vp"';
-                else if (v === 'medium') v = '"3vp"';
-                else if (v === 'thick') v = '"4vp"';
-                else v = convertLength(v);
-                borderWidthObject[n_n.slice(7, -6)] = v;
-              }
+              
+                if (inlineMode) {
+                  distVString = v;
+                  try {
+                    v = JSON.parse(v);
+                    if (v === 'thin') distVString = '"1vp"';
+                    else if (v === 'medium') distVString = '"3vp"';
+                    else if (v === 'thick') distVString = '"4vp"';
+                    else distVString = convertLength(v);
+                  } catch (e) {
+                    debugger
+                  }
+
+                } else {
+                  if (v === 'thin') distVString = '"1vp"';
+                  else if (v === 'medium') distVString = '"3vp"';
+                  else if (v === 'thick') distVString = '"4vp"';
+                  else v = convertLength(v);
+                }
+
+                
+                borderWidthObject[n_n.slice(7, -6)] = distVString;
               break;
             case "border-color":
               v = convertColor(v);
@@ -1622,51 +1682,51 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
       let minWidth = computedStyle.minWidth;
       let minHeight = computedStyle.minHeight;
-      {
+      // {
         
-        if (minWidth || minHeight) {
-          if (!node.childNodes) node.childNodes = [];
+      //   if (minWidth || minHeight) {
+      //     if (!node.childNodes) node.childNodes = [];
   
-          let newChildName;
+      //     let newChildName;
   
-          if (minWidth && minHeight) {
-            newChildName = '::min-width-height';
-          } else {
-            newChildName = minWidth ? '::min-width' : '::min-height';
-          }
+      //     if (minWidth && minHeight) {
+      //       newChildName = '::min-width-height';
+      //     } else {
+      //       newChildName = minWidth ? '::min-width' : '::min-height';
+      //     }
   
-          node.childNodes.unshift(
-            {
-              get parentNode () {
-                return node;
-              },
-              tagName: newChildName,
-              _convertedTagName: "Column",
-              logic: {
-                uuid: typeof node.logic.uuid === 'string' ? node.logic.uuid + newChildName :
-                  (
-                    (node.logic.uuid.type === 'Literal') ? node.logic.uuid.value + newChildName :
-                      {
-                        type: "BinaryExpression",
-                        left: node.logic.uuid,
-                        operator: '+',
-                        right: {
-                          type: 'Literal',
-                          value: newChildName
-                        }
-                      }
-                  )
-              },
-              attrs: {
-                style: (minWidth ? `width:${minWidth};margin-right:-${minWidth};` : '')
-                + (minHeight ? `height:${minHeight};margin-bottom:-${minHeight};` : '')
-                + `z-index:-999;`
-              }
-            }
-          )
-        }
+      //     node.childNodes.unshift(
+      //       {
+      //         get parentNode () {
+      //           return node;
+      //         },
+      //         tagName: newChildName,
+      //         _convertedTagName: "Column",
+      //         logic: {
+      //           uuid: typeof node.logic.uuid === 'string' ? node.logic.uuid + newChildName :
+      //             (
+      //               (node.logic.uuid.type === 'Literal') ? node.logic.uuid.value + newChildName :
+      //                 {
+      //                   type: "BinaryExpression",
+      //                   left: node.logic.uuid,
+      //                   operator: '+',
+      //                   right: {
+      //                     type: 'Literal',
+      //                     value: newChildName
+      //                   }
+      //                 }
+      //             )
+      //         },
+      //         attrs: {
+      //           style: (minWidth ? `width:${minWidth};margin-right:-${minWidth};` : '')
+      //           + (minHeight ? `height:${minHeight};margin-bottom:-${minHeight};` : '')
+      //           + `z-index:-999;`
+      //         }
+      //       }
+      //     )
+      //   }
         
-      }
+      // }
   
       {
         let paddingStr = ret.find(v=>v.startsWith(".padding("))
@@ -1711,7 +1771,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             let maxWidth = computedStyle.maxWidth;
   
             if (minHeight || maxHeight || minWidth || maxWidth) {
-              debugger
+              // debugger
               ASSERT(paddingObjectE.type === 'ObjectExpression' && !paddingObjectE.properties.filter(o => o.value.type !== 'Literal').length, 'content-box must has a certain padding')
               
               
@@ -1743,25 +1803,77 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
                 maxWidth = plusPixel(mergeLR, maxWidth);
               }
   
+              let retConstraintSize = ""
+              let constraintSizeObj = new javascript.astFactory.ObjectExpression([]);
+
               if (typeof minHeight === 'object') {
-                minHeight = getExpressionWithForDomain(node, minHeight).astString;
+                constraintSizeObj.properties.push({key: "minHeight", value: minHeight})
+                retConstraintSize += "minHeight:" + getExpressionWithForDomain(node, minHeight).astString + ", ";
+              } else if (typeof minHeight === 'string') {
+                constraintSizeObj.properties.push({key: "minHeight", value: new javascript.astFactory.Literal(minHeight)});
               }
   
               if (typeof minWidth === 'object') {
-                minWidth = getExpressionWithForDomain(node, minWidth).astString;
+                constraintSizeObj.properties.push({key: "minWidth", value: minWidth})
+                retConstraintSize += "minWidth:" + getExpressionWithForDomain(node, minWidth).astString + ", ";
+              } else if (typeof minWidth === 'string') {
+                constraintSizeObj.properties.push({key: "minWidth", value: new javascript.astFactory.Literal(minWidth)});
+              }
+
+              if (typeof maxHeight === 'object') {
+                constraintSizeObj.properties.push({key: "maxHeight", value: maxHeight})
+                retConstraintSize += "maxHeight:" + getExpressionWithForDomain(node, maxHeight).astString + ", ";
+              } else if (typeof maxHeight === 'string') {
+                constraintSizeObj.properties.push({key: "maxHeight", value: new javascript.astFactory.Literal(maxHeight)});
               }
   
-              if (computedStyle.minHeight) {
-  
-                node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
-                  .replace(`height:${(computedStyle.minHeight)}`, `height:${(minHeight)}`)
-                  .replace(`margin-bottom:${(computedStyle.minHeight)}`, `margin-bottom:${minHeight}`)
+              if (typeof maxWidth === 'object') {
+                constraintSizeObj.properties.push({key: "maxWidth", value: maxWidth})
+                retConstraintSize += "maxWidth:" + getExpressionWithForDomain(node, maxWidth).astString+ ", ";
+              } else if (typeof maxWidth === 'string') {
+                constraintSizeObj.properties.push({key: "maxWidth", value: new javascript.astFactory.Literal(maxWidth)});
               }
-              if (computedStyle.minWidth) {
-                node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
-                  .replace(`width:${(computedStyle.minWidth)}`, `width:${(minWidth)}`)
-                  .replace(`margin-right:${(computedStyle.minWidth)}`, `margin-right:${minWidth}`)
+
+              if (retConstraintSize) {
+                retConstraintSize = ".constraintSize({" + retConstraintSize.slice(0, -2) + "})";
+                ret.push(retConstraintSize);
+
+                computedStyle.constraintSize = constraintSizeObj;
               }
+
+              
+              // if (computedStyle.minHeight) {
+
+              //   if (typeof minHeight === 'object') {
+              //     debugger
+              //     minHeight = javascript.serialize(minHeight)
+                  
+              //     let newStyle = node.childNodes[0].attrs.style
+              //     .replace(`height:${(computedStyle.minHeight)}`, () => `height:{{(`+ minHeight + `)}}`)
+              //     .replace(`margin-bottom:-${(computedStyle.minHeight)}`, () => `margin-bottom:{{-(` + minHeight + `)}}`)
+
+              //     node.childNodes[0].attrs.style = mustache.parse(newStyle)
+                 
+              //   } else {
+              //     node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
+              //     .replace(`height:${(computedStyle.minHeight)}`, `height:{{${(minHeight)}}}`)
+              //     .replace(`margin-bottom:${(computedStyle.minHeight)}`, `margin-bottom:{{-(${minHeight})}}`)
+              //   }
+
+                
+                
+               
+              // }
+              // if (computedStyle.minWidth) {
+              //   if (typeof minWidth === 'object') {
+
+              //   } else {
+              //     node.childNodes[0].attrs.style = node.childNodes[0].attrs.style
+              //     .replace(`width:${(computedStyle.minWidth)}`, `width:${(minWidth)}`)
+              //     .replace(`margin-right:${(computedStyle.minWidth)}`, `margin-right:${minWidth}`)
+              //   }
+
+              // }
   
             }
           }
@@ -2350,63 +2462,154 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (l == 0) return r;
     else if (r == 0) return l;
 
-    if (l.endsWith("lpx")) {
-      if (r.endsWith("lpx"))
-        return parseFloat(l) + parseFloat(r) + "lpx"
-      else if (r.endsWith("vp") || r.endsWith("px")) {
-        return new javascript.astFactory.BinaryExpression(
-          "+",
-          new javascript.astFactory.BinaryExpression(
-            "+",
-            new javascript.astFactory.Literal(parseFloat(l)),
-            new javascript.astFactory.CallExpression(
-              new javascript.astFactory.Identifier("px2lpx"),
-              [
-                new javascript.astFactory.CallExpression(
-                  new javascript.astFactory.Identifier("vp2px"),
-                  [
-                    new javascript.astFactory.Literal(parseFloat(r)),
-                  ]
-                )
-              ]
-            ),
-          ),
-          new javascript.astFactory.Literal("lpx")
-        );
+    if (!l.endsWith("lpx") && l.endsWith("px")) {
+       l = l.slice(0, -2) + "vp"
+    } 
+    
+    if (!r.endsWith("lpx") && r.endsWith("px")) {
+      r = r.slice(0, -2) + "vp"
+   }
+
+
+    if (l.endsWith("lpx") && r.endsWith("lpx")) {
+      return parseFloat(l) + parseFloat(r) + "lpx";
+    } else if (l.endsWith("vp") && r.endsWith("vp")) {
+      return parseFloat(l) + parseFloat(r) + "vp";
+    } else if (l.endsWith("vh") && r.endsWith("vh")) {
+      return new javascript.astFactory.BinaryExpression(
+        "*",
+        new javascript.astFactory.Literal((parseFloat(l) + parseFloat(r))/100),
+        new javascript.astFactory.Identifier("$$EXTERNAL_SCOPE__SCREEN_HEIGHT")
+      );
+    } else {
+      //must different
+      let retAst;
+      let hasSwapLR = false;
+
+      if (l.endsWith("vh")) {
+        let tmp = l;
+        l = r;
+        r = tmp;
+        hasSwapLR = true;
       }
-      else 
-        ASSERT(false, 'not support plus pixel with differnt unit')
-    } else if (l.endsWith("vp") || l.endsWith("px")) {
-      if (r.endsWith("lpx")) {
-        return new javascript.astFactory.BinaryExpression(
-          "+",
-          new javascript.astFactory.BinaryExpression(
+
+      if (l.endsWith("lpx")) {
+        if (r.endsWith("vp")) {
+          retAst = new javascript.astFactory.BinaryExpression(
             "+",
-            new javascript.astFactory.Literal(parseFloat(l)),
-            new javascript.astFactory.CallExpression(
-              new javascript.astFactory.Identifier("px2vp"),
-              [
-                new javascript.astFactory.CallExpression(
-                  new javascript.astFactory.Identifier("lpx2px"),
-                  [
-                    new javascript.astFactory.Literal(parseFloat(r)),
-                  ]
-                )
-              ]
+            new javascript.astFactory.BinaryExpression(
+              "+",
+              new javascript.astFactory.Literal(parseFloat(l)),
+              new javascript.astFactory.CallExpression(
+                new javascript.astFactory.Identifier("px2lpx"),
+                [
+                  new javascript.astFactory.CallExpression(
+                    new javascript.astFactory.Identifier("vp2px"),
+                    [
+                      new javascript.astFactory.Literal(parseFloat(r)),
+                    ]
+                  )
+                ]
+              ),
             ),
-          ),
-          new javascript.astFactory.Literal("vp")
-        );
+            new javascript.astFactory.Literal("lpx")
+          );
+        } else if (r.endsWith("vh")) {
+          // debugger
+          let vhNumer = parseFloat(r) / 100;
+          let rAst = new javascript.astFactory.Identifier("$$EXTERNAL_SCOPE__SCREEN_HEIGHT")
+          if (vhNumer === 1) {
+          } else {
+            rAst = new javascript.astFactory.BinaryExpression(
+              "*",
+              new javascript.astFactory.Literal(vhNumer),
+              rAst
+            );
+          }
+  
+          let lAst = new javascript.astFactory.CallExpression(
+            new javascript.astFactory.Identifier("px2vp"),
+            [
+              new javascript.astFactory.CallExpression(
+                new javascript.astFactory.Identifier("lpx2px"),
+                [
+                  new javascript.astFactory.Literal(parseFloat(l)),
+                ]
+              )
+            ]
+          )
+  
+          retAst = new javascript.astFactory.BinaryExpression(
+            "+",
+            lAst,
+            rAst
+          )
+        }
+        else 
+          ASSERT(false, 'not support plus pixel with differnt unit')
+      } else if (l.endsWith("vp")) {
+        if (r.endsWith("lpx")) {
+          retAst = //new javascript.astFactory.BinaryExpression(
+            //"+",
+            new javascript.astFactory.BinaryExpression(
+              "+",
+              new javascript.astFactory.Literal(parseFloat(l)),
+              new javascript.astFactory.CallExpression(
+                new javascript.astFactory.Identifier("px2vp"),
+                [
+                  new javascript.astFactory.CallExpression(
+                    new javascript.astFactory.Identifier("lpx2px"),
+                    [
+                      new javascript.astFactory.Literal(parseFloat(r)),
+                    ]
+                  )
+                ]
+              ),
+            )
+            // ,new javascript.astFactory.Literal("vp"));
+          
+        }
+        else if (r.endsWith("vh")) {
+          debugger
+          let vhNumer = parseFloat(r) / 100;
+          let rAst = new javascript.astFactory.Identifier("$$EXTERNAL_SCOPE__SCREEN_HEIGHT")
+
+          if (vhNumer === 1) {
+          } else {
+            rAst = new javascript.astFactory.BinaryExpression(
+              "*",
+              new javascript.astFactory.Literal(vhNumer),
+              rAst
+            );
+          }
+          let lAst = new  javascript.astFactory.Literal(parseFloat(l));
+
+          retAst = new javascript.astFactory.BinaryExpression(
+            "+",
+            lAst,
+            rAst
+          );
+        }
+        else {
+          ASSERT(false, 'not support plus pixel with differnt unit');
+        }
       }
-      else if (r.endsWith("vp") ||r.endsWith("px"))
-        return parseFloat(l) + parseFloat(r) + "vp"
-      else 
-        ASSERT(false, 'not support plus pixel with differnt unit');
+      
+      if (hasSwapLR ) {
+        if (retAst && retAst.type === "BinaryExpression"
+        && retAst.operator === '*'
+        ) {
+          let tmp = retAst.left;
+          retAst.left = retAst.right;
+          retAst.right = retAst.tmp;
+        } else {
+          ASSERT(false)
+        }
+
+      }
+
+      return retAst;
     }
-    else {
-      ASSERT(false, 'not support plus pixel with differnt unit');
-    }
-    debugger
   }
 
   function getExpandString(o, key, computedStyle) {
@@ -2583,13 +2786,13 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     if (v.endsWith("vh")) {
       v = parseFloat(v.slice(0, -2)) / 100;
       if (v === 1)
-        v = `Device.height`;
+        v = `$$EXTERNAL_SCOPE__SCREEN_HEIGHT`;
       else if (v === -1)
-        v = `-Device.height`;
+        v = `-$$EXTERNAL_SCOPE__SCREEN_HEIGHT`;
       else if (v === 0)
         v = 0;
       else 
-        v = `${v} * Device.height`;
+        v = `${v} * $$EXTERNAL_SCOPE__SCREEN_HEIGHT`;
     } else if (v.endsWith("lpx")) {
       v = `"${v}"`
     } else if (v.endsWith("px")) {
@@ -2597,6 +2800,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     } else {
       v = `"${v}"`
     }
-    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`vp"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`Device.height`));
+    ASSERT(v.endsWith(`lpx"`) || v.endsWith(`vp"`) || v.endsWith(`fp"`)  || v.endsWith(`%"`) || v.endsWith(`$$EXTERNAL_SCOPE__SCREEN_HEIGHT`));
     return v
   }

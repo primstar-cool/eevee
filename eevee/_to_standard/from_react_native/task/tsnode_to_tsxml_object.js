@@ -140,7 +140,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
     let xmlObject = dumpNode(nodeJsxRoot)
     removeEmptyNode(xmlObject);
 
-    let loaclVarUsed = xmlObject.logic.rks.filter(v=>v.startsWith("@LOCAL__")).map(v=>v.substr(8));
+    let loaclVarUsed = xmlObject.logic.rks.filter(v=>v.startsWith("$$LOCAL__")).map(v=>v.substr(8));
 
     // debugger
     // let memberVarUsed = [];
@@ -169,7 +169,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
             return {
                 tagName: "identifier",
                 id: id,
-                scope: "@LOCAL__",
+                scope: "$$LOCAL__",
                 kind: varVO.kind,
                 type: {
                     'BooleanKeyword': 'boolean',
@@ -178,7 +178,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
                 }[varVO.type] || 'any',
                 code: code,
                 logic: {
-                    rks: rks.filter(v=> v !== "@LOCAL__" + id)
+                    rks: rks.filter(v=> v !== "$$LOCAL__" + id)
                 }
             }
             
@@ -212,12 +212,12 @@ module.exports = function (astNode, tagNameBuiltInList) {
                     }
                 }
             ].concat(localVarChildNodes).concat(
-                funcDeclarationLists.filter(fv => allLocalRefer.includes("@LOCAL_FUNC__" + fv)).map(
+                funcDeclarationLists.filter(fv => allLocalRefer.includes("$$LOCAL_FUNC__" + fv)).map(
 
                     fv => ({
                         tagName: "identifier",
                         id: fv,
-                        scope: "@LOCAL_FUNC__",
+                        scope: "$$LOCAL_FUNC__",
                         // kind: "function",
                         // type: 'function',
                         // code: fv,  
@@ -534,7 +534,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
                 if (!forNodeInner.logic) forNodeInner.logic = {};
 
                 let forNodeInnerRks = (forNodeInner.logic.rks||[]).filter(
-                    v=> (v !== '@EXTERNAL_SCOPE__' +forNodeLogic["for-item"].value ) && (v !== '@EXTERNAL_SCOPE__' + (forNodeLogic["for-index"]||{}).value)
+                    v=> (v !== '$$EXTERNAL_SCOPE__' +forNodeLogic["for-item"].value ) && (v !== '$$EXTERNAL_SCOPE__' + (forNodeLogic["for-index"]||{}).value)
                 )
 
                 forNodeLogic.rks = Array.from(new Set(referKeys.concat(forNodeInnerRks)));
@@ -735,16 +735,16 @@ module.exports = function (astNode, tagNameBuiltInList) {
             
             if (!holder) {
                 if (localVarNameDict[name]) {
-                    referKeys.push(`@LOCAL__${name}`)
-                    return new javascript.astFactory.Identifier(`@LOCAL__${name}`);
+                    referKeys.push(`$$LOCAL__${name}`)
+                    return new javascript.astFactory.Identifier(`$$LOCAL__${name}`);
                 } else {
 
                     if (loopIgnoreIds.includes(name)) {
                         referKeys.push(`${name}`)
                         return new javascript.astFactory.Identifier(`${name}`);
                     } else {
-                        referKeys.push(`@EXTERNAL_SCOPE__${name}`)
-                        return new javascript.astFactory.Identifier(`@EXTERNAL_SCOPE__${name}`);
+                        referKeys.push(`$$EXTERNAL_SCOPE__${name}`)
+                        return new javascript.astFactory.Identifier(`$$EXTERNAL_SCOPE__${name}`);
                     }
                     
                 }
@@ -859,7 +859,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
                     if (objArgsArray.length > 1) {
                         return new javascript.astFactory.CallExpression(
                             new javascript.astFactory.MemberExpression(
-                                new javascript.astFactory.Identifier('@EXTERNAL_SCOPE__Object'),
+                                new javascript.astFactory.Identifier('$$EXTERNAL_SCOPE__Object'),
                                 new javascript.astFactory.Identifier('assign'),
                                 false
                             ),
@@ -990,7 +990,7 @@ function _analysisReferKeys(code, myName) {
                                     
                                     if (functionDepth === 0) {
                                         localVar.push(objV.id.name);
-                                        referKeys.push("@LOCAL__" + objV.id.name);
+                                        referKeys.push("$$LOCAL__" + objV.id.name);
                                     }
                                     else {
                                         localSubFuncVar[functionDepth].push(objV.id.name);
@@ -1125,10 +1125,10 @@ function _analysisReferKeys(code, myName) {
             if (localFunc.includes(name)) {
                 // debugger
                 // call local func  tion
-                referKeys.push("@LOCAL_FUNC__" + name);
+                referKeys.push("$$LOCAL_FUNC__" + name);
 
             } else {
-                referKeys.push((localVar.includes(name) ? "@LOCAL__" : "@EXTERNAL_SCOPE__") + name);
+                referKeys.push((localVar.includes(name) ? "$$LOCAL__" : "$$EXTERNAL_SCOPE__") + name);
 
             }
         }
