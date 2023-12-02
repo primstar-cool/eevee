@@ -272,6 +272,20 @@
           "tagName": "identifier",
           "id": "_getClosureResult",
           "scope": "$$LOCAL_FUNC__"
+        },
+        {
+          "tagName": "identifier",
+          "id": "$$EXTERNAL_SCOPE__styles",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        },
+        {
+          "tagName": "identifier",
+          "id": "$$LOCAL__isDarkMode",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
         }
       ],
       "sourceType": "react_native"

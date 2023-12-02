@@ -140,7 +140,7 @@ module.exports = function (astNode, tagNameBuiltInList) {
     let xmlObject = dumpNode(nodeJsxRoot)
     removeEmptyNode(xmlObject);
 
-    let loaclVarUsed = xmlObject.logic.rks.filter(v=>v.startsWith("$$LOCAL__")).map(v=>v.substr(8));
+    let loaclVarUsed = xmlObject.logic.rks.filter(v=>v.startsWith("$$LOCAL__")).map(v=>v.substr(9));
 
     // debugger
     // let memberVarUsed = [];
