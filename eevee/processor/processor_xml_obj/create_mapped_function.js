@@ -10,7 +10,15 @@ module.exports = createMappedFunction;
 createMappedFunction.createFunctionStr = (ast) => {
 
     if (ast.type === "Identifier") {
-        return `\t\t/*0*/\n\t\t/*${JSON.stringify(ast)}*/\n\t\tfunction (_cONTEXT) {\n\t\t\treturn (_cONTEXT.${ast.name});\n\t\t}`
+
+        let astName;
+        if (ast.name.startsWith("$$EXTERNAL_SCOPE__")) {
+            astName = ast.name.substr(18)
+        } else {
+            astName = `_cONTEXT.${ast.name}`;
+        }
+
+        return `\t\t/*0*/\n\t\t/*${JSON.stringify(ast)}*/\n\t\tfunction (_cONTEXT) {\n\t\t\treturn (${astName});\n\t\t}`
     }
 
     let nodeWrapper = {data: ast};
@@ -189,7 +197,8 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
            return createAObjFunctionStr(obj, _referKeys);
         else {
           if (obj.type === "Identifier") {
-            addReferKey(obj.name, _referKeys);
+            if (!obj.name.startsWith("$$"))
+                addReferKey(obj.name, _referKeys);
           } 
         //   else if (obj.type === "ObjectExpression") {
         //     obj.properties.forEach(
@@ -220,8 +229,15 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
         var ret;
         if (obj.type === "Identifier") {
             if (!holder) {
-                ret = '_cONTEXT.' + obj.name;
-                addReferKey(obj.name, _referKeys);
+
+                if (obj.name.startsWith('$$EXTERNAL_SCOPE__')) {
+                    ret = obj.name.substr(18);
+                } else {
+                    ret = '_cONTEXT.' + obj.name;
+                    addReferKey(obj.name, _referKeys);
+                }
+
+                
             } else {
                 ret = obj.name;
             }
@@ -272,7 +288,9 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
                 , "px2vp", "vp2px", "px2lpx", "lpx2px", 
             ].includes(objCallee.name)) {
                 return objCallee.name;
-            } 
+            } else if (objCallee.type === 'Identifier' && objCallee.name.startsWith('$$EXTERNAL_SCOPE__')) {
+                return objCallee.name.substr(18);
+            }
             // else if (objCallee.type === 'MemberExpression'
             // && objCallee.object.type === 'Identifier'
             // && objCallee.property.type === 'Identifier'
@@ -305,8 +323,8 @@ function createMappedFunction(node, replaceNode, monitorFor, saveOriginalNode, t
 
                         let objName = loopObjCallee.object.name;
 
-                        if (objName.startsWith("@EXTERNAL_SCOPE__"))
-                            objName = objName.substr(17);
+                        if (objName.startsWith("$$EXTERNAL_SCOPE__"))
+                            objName = objName.substr(18);
 
                         if (objName === "JSON"
                         || objName === "Math"

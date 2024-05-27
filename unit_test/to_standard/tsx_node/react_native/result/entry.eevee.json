@@ -18,7 +18,7 @@
                     "type": "MemberExpression",
                     "object": {
                       "type": "Identifier",
-                      "name": "@EXTERNAL_SCOPE__Object"
+                      "name": "$$EXTERNAL_SCOPE__Object"
                     },
                     "property": {
                       "type": "Identifier",
@@ -78,7 +78,7 @@
                             "type": "ConditionalExpression",
                             "test": {
                               "type": "Identifier",
-                              "name": "@LOCAL__isDarkMode"
+                              "name": "$$LOCAL__isDarkMode"
                             },
                             "consequent": {
                               "type": "Literal",
@@ -155,7 +155,7 @@
               ],
               "logic": {
                 "rks": [
-                  "@EXTERNAL_SCOPE__styles"
+                  "$$EXTERNAL_SCOPE__styles"
                 ]
               }
             },
@@ -214,15 +214,15 @@
               ],
               "logic": {
                 "rks": [
-                  "@EXTERNAL_SCOPE__styles"
+                  "$$EXTERNAL_SCOPE__styles"
                 ]
               }
             }
           ],
           "logic": {
             "rks": [
-              "@EXTERNAL_SCOPE__styles",
-              "@LOCAL__isDarkMode"
+              "$$EXTERNAL_SCOPE__styles",
+              "$$LOCAL__isDarkMode"
             ]
           }
         }
@@ -247,31 +247,45 @@
           ],
           "logic": {
             "rks": [
-              "@EXTERNAL_SCOPE__Date",
-              "@LOCAL_FUNC___getClosureResult",
-              "@EXTERNAL_SCOPE__Math"
+              "$$EXTERNAL_SCOPE__Date",
+              "$$LOCAL_FUNC___getClosureResult",
+              "$$EXTERNAL_SCOPE__Math"
             ]
           }
         },
         {
           "tagName": "identifier",
           "id": "isDarkMode",
-          "scope": "@LOCAL__",
+          "scope": "$$LOCAL__",
           "kind": "const",
           "type": "any",
           "code": "export default function () /*isDarkMode*/ {\n  function _getClosureResult() {\n    var localFuncVarA = Date.now();\n    return 50 + localFuncVarA;\n  }\n  const isDarkMode = _getClosureResult() && Math.random() < 0.5;\n  return isDarkMode;\n}",
           "logic": {
             "rks": [
-              "@EXTERNAL_SCOPE__Date",
-              "@LOCAL_FUNC___getClosureResult",
-              "@EXTERNAL_SCOPE__Math"
+              "$$EXTERNAL_SCOPE__Date",
+              "$$LOCAL_FUNC___getClosureResult",
+              "$$EXTERNAL_SCOPE__Math"
             ]
           }
         },
         {
           "tagName": "identifier",
           "id": "_getClosureResult",
-          "scope": "@LOCAL_FUNC__"
+          "scope": "$$LOCAL_FUNC__"
+        },
+        {
+          "tagName": "identifier",
+          "id": "$$EXTERNAL_SCOPE__styles",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
+        },
+        {
+          "tagName": "identifier",
+          "id": "$$LOCAL__isDarkMode",
+          "scope": "@CONTEXT__",
+          "kind": "var",
+          "type": "any"
         }
       ],
       "sourceType": "react_native"

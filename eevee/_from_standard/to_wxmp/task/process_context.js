@@ -36,13 +36,13 @@ module.exports = function processContext(contextNode, templateNode, mainClassNam
 
   let canComuterVar = localVarFunc.filter(
     v => {
-      if (!v.scope.startsWith("@LOCAL__")) return false;
+      if (!v.scope.startsWith("$$LOCAL__")) return false;
       if (!v.logic) return true;
       if (!v.logic.rks) return true;
 
-      if (v.logic.rks.filter(key => key.startsWith("@LOCAL__")).length) return false;
+      if (v.logic.rks.filter(key => key.startsWith("$$LOCAL__")).length) return false;
 
-      let referLocalFunc = v.logic.rks.filter(key => key.startsWith("@LOCAL_FUNC__"));
+      let referLocalFunc = v.logic.rks.filter(key => key.startsWith("$$LOCAL_FUNC__"));
 
       if (!referLocalFunc.length) return true;
 
@@ -61,7 +61,7 @@ module.exports = function processContext(contextNode, templateNode, mainClassNam
   );
   // debugger
   let canComuterVarName = canComuterVar.map(v=>v.id);
-  let notComputeVar = localVarFunc.filter(v=> v.scope.startsWith("@LOCAL__") && !canComuterVar.includes(v));
+  let notComputeVar = localVarFunc.filter(v=> v.scope.startsWith("$$LOCAL__") && !canComuterVar.includes(v));
 
   require("../../helpers/process_context_spec_scope.js")(
     templateNode, transLocal, transMember, null

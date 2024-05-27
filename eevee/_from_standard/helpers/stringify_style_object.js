@@ -40,7 +40,7 @@ module.exports = function (style) {
     if (objAst.type === 'CallExpression'
       && objAst.callee.type === 'MemberExpression'
       && objAst.callee.object.type === 'Identifier'
-      && objAst.callee.object.name === '@EXTERNAL_SCOPE__Object'
+      && objAst.callee.object.name === '$$EXTERNAL_SCOPE__Object'
       && objAst.callee.property.type === 'Identifier'
       && objAst.callee.property.name === 'assign'
 
