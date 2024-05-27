@@ -164,10 +164,12 @@ function parseXML(xmlString) {
                  */
                 continue;
               }
+              __debug_ASSERT(lastNode.tagName === tagName.substr(1), 'unpair tagname:' , lastNode.tagName , tagName.substr(1));
 
               // 闭合标签
+              __debug_ASSERT(lastNode.parentNode);
               lastNode = lastNode.parentNode;
-              __debug_ASSERT(lastNode);
+              // __debug_ASSERT(lastNode);
               state = ST.FIND_TAG;
 
               // do {
