@@ -116,7 +116,7 @@ module.exports = function genWrapTextNode(nodeInfos, functionArray) {
             richTextNode._uuid = uuidString;
           }
 
-          retStr += nodeInfos.map(v => (v.cmdsNew.length ? v.str : v.strNew).trim().replace("Text(", genIndent(1) + "Span(")).join("\n")
+          retStr += nodeInfos.map(v => ((v.cmdsNew && v.cmdsNew.length) ? v.strNew : v.str).trim().replace("Text(", genIndent(1) + "Span(")).join("\n")
 
           retStr += "\n}"
 

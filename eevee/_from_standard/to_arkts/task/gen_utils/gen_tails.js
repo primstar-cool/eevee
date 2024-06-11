@@ -1211,6 +1211,9 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
 
   function getValueString(cssClassStyle, computedStyle, node, inlineMode) {
+    
+    // if (!node) debugger
+
     let ret = [];
 
     let marginObject = {};
@@ -1274,7 +1277,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
             // debugger
 
-            if (!(node._convertedTagName === 'TextInput' && n_n === "line-height"))
+            if (!(node && node._convertedTagName === 'TextInput' && n_n === "line-height"))
               ret.push(`.${nN}(${distVString})`)
             
             break;

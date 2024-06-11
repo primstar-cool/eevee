@@ -32,6 +32,8 @@ module.exports = function genParams(node, destClassTagName, functionArray, style
 
   }
 
+  // if (!node.logic) debugger
+
   uuid = getObjectDataExpression(node.logic.uuid, functionArray);
   if (uuid.startsWith("\"")) uuid = JSON.parse(uuid);
 

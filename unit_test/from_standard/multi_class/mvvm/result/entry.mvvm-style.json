@@ -1,0 +1,128 @@
+[
+  {
+    "route": [
+      {
+        "tag": "view"
+      }
+    ],
+    "style": {
+      "width": 100,
+      "height": 100
+    }
+  },
+  {
+    "route": [
+      {
+        "classList": [
+          "classA"
+        ]
+      }
+    ],
+    "style": {
+      "width": 200,
+      "height": 200
+    }
+  },
+  {
+    "route": [
+      {
+        "classList": [
+          "big"
+        ]
+      }
+    ],
+    "style": {
+      "width": 550
+    }
+  },
+  {
+    "route": [
+      {
+        "classList": [
+          "font-color"
+        ]
+      }
+    ],
+    "style": {
+      "color": "#FFFF00"
+    }
+  },
+  {
+    "route": [
+      {
+        "classList": [
+          "bg-color"
+        ]
+      }
+    ],
+    "style": {
+      "background-color": "#FFC0CB"
+    }
+  },
+  {
+    "route": [
+      {
+        "tag": "view",
+        "classList": [
+          "type-1"
+        ]
+      }
+    ],
+    "style": {
+      "background-color": "#FF0000",
+      "width": 300
+    }
+  },
+  {
+    "route": [
+      {
+        "tag": "view",
+        "classList": [
+          "type-2"
+        ]
+      }
+    ],
+    "style": {
+      "background-color": "#0000FF",
+      "border-top-width": "2px",
+      "border-right-width": "2px",
+      "border-bottom-width": "2px",
+      "border-left-width": "2px"
+    }
+  },
+  {
+    "route": [
+      {
+        "tag": "view",
+        "classList": [
+          "type-3"
+        ]
+      }
+    ],
+    "style": {
+      "background-color": "#008000",
+      "margin-top": 75,
+      "margin-right": 75,
+      "margin-bottom": 75,
+      "margin-left": 75
+    }
+  },
+  {
+    "route": [
+      {
+        "classList": [
+          "big"
+        ]
+      },
+      ">",
+      {
+        "classList": [
+          "sub-text"
+        ]
+      }
+    ],
+    "style": {
+      "color": "#800080"
+    }
+  }
+]

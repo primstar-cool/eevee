@@ -37,6 +37,7 @@ module.exports = function standard2wxml(
       destFilePath,
       rootSrcPath,
       mainClassName,
+      screenWidthRem,
       getIncludedStandardTreeFn,
       onFoundImportTemplateFn,
       onFoundEventHandlerFn,
@@ -79,7 +80,7 @@ module.exports = function standard2wxml(
       }
 
       resolveTagImage(node);
-      transformStyleRem2Rpx(node, cssDomain);
+      transformStyleRem2Rpx(node, cssDomain, screenWidthRem);
 
       resolveAttrsLogicFor(node);
       resolveAttrsLogicIf(node);
@@ -417,9 +418,9 @@ module.exports = function standard2wxml(
   
   }
   
-  function transformStyleRem2Rpx(node, cssDomain) {
+  function transformStyleRem2Rpx(node, cssDomain, screenWidthRem) {
 
-    const replaceRem2Rpx = replaceRemT2Rpx(7.5);
+    const replaceRem2Rpx = replaceRemT2Rpx(screenWidthRem);
 
     if (node.attrs && node.attrs.style) {
       if (

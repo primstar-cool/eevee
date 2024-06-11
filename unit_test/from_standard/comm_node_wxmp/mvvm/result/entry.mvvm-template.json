@@ -1,0 +1,115 @@
+{
+  "childNodes": [
+    {
+      "tagName": "view",
+      "childNodes": [
+        {
+          "tagName": "text",
+          "data": "normarl text",
+          "logic": {
+            "uuid": "entry-s2"
+          },
+          "isStatic": true
+        },
+        {
+          "data": "<!-- single line comment-->",
+          "logic": {
+            "uuid": "entry-s3"
+          },
+          "isStatic": true
+        },
+        {
+          "tagName": "text",
+          "data": {
+            "type": "Identifier",
+            "name": "dynText",
+            "mustache": true
+          },
+          "logic": {
+            "uuid": "entry-s4"
+          }
+        },
+        {
+          "data": "\n    no tag text\n    ",
+          "logic": {
+            "uuid": "entry-s5"
+          },
+          "isStatic": true
+        },
+        {
+          "data": "<!-- multi\n        <fakeNode>\n        <open-node\n         line comment-->",
+          "logic": {
+            "uuid": "entry-s6"
+          },
+          "isStatic": true
+        },
+        {
+          "tagName": "image",
+          "attrs": {
+            "src": "abc"
+          },
+          "logic": {
+            "uuid": "entry-s7"
+          },
+          "isStatic": true
+        },
+        {
+          "tagName": "view",
+          "attrs": {
+            "attr0": "</view>",
+            "attr123": {
+              "type": "BinaryExpression",
+              "operator": "+",
+              "left": {
+                "type": "BinaryExpression",
+                "operator": "+",
+                "left": {
+                  "type": "Identifier",
+                  "name": "attr1"
+                },
+                "right": {
+                  "type": "Identifier",
+                  "name": "attr2"
+                },
+                "mustache": true
+              },
+              "right": {
+                "type": "Literal",
+                "value": "attr3"
+              }
+            },
+            "data-attr": "<view>"
+          },
+          "logic": {
+            "uuid": "entry-s8"
+          }
+        }
+      ],
+      "logic": {
+        "uuid": "entry-s1",
+        "rks": [
+          "dynText",
+          "attr1",
+          "attr2"
+        ]
+      }
+    },
+    {
+      "tagName": "text",
+      "data": "multi node",
+      "logic": {
+        "uuid": "entry-s9"
+      },
+      "isStatic": true
+    }
+  ],
+  "tagName": "template",
+  "logic": {
+    "uuid": "entry-s0",
+    "rks": [
+      "dynText",
+      "attr1",
+      "attr2"
+    ]
+  }
+}

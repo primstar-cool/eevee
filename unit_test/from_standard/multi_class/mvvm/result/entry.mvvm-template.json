@@ -1,0 +1,215 @@
+{
+  "childNodes": [
+    {
+      "tagName": "view",
+      "attrs": {
+        "class": {
+          "type": "BinaryExpression",
+          "operator": "+",
+          "left": {
+            "type": "Literal",
+            "value": "classA"
+          },
+          "right": {
+            "type": "ConditionalExpression",
+            "test": {
+              "type": "Identifier",
+              "name": "isBig"
+            },
+            "consequent": {
+              "type": "Literal",
+              "value": " big"
+            },
+            "alternate": {
+              "type": "Literal",
+              "value": ""
+            },
+            "mustache": true
+          }
+        }
+      },
+      "childNodes": [
+        {
+          "tagName": "text",
+          "attrs": {
+            "class": "sub-text"
+          },
+          "logic": {
+            "uuid": "entry-s2-c-sub-text"
+          },
+          "isStatic": true
+        }
+      ],
+      "logic": {
+        "uuid": "entry-s1-cl-classA",
+        "rks": [
+          "isBig"
+        ]
+      }
+    },
+    {
+      "tagName": "view",
+      "attrs": {
+        "id": {
+          "type": "BinaryExpression",
+          "operator": "+",
+          "left": {
+            "type": "ConditionalExpression",
+            "test": {
+              "type": "Identifier",
+              "name": "idTest"
+            },
+            "consequent": {
+              "type": "Literal",
+              "value": "idT"
+            },
+            "alternate": {
+              "type": "Literal",
+              "value": "idF"
+            },
+            "mustache": true
+          },
+          "right": {
+            "type": "Literal",
+            "value": "-extra"
+          }
+        },
+        "class": "classB"
+      },
+      "childNodes": [
+        {
+          "tagName": "text",
+          "attrs": {
+            "class": "sub-text"
+          },
+          "logic": {
+            "uuid": "entry-s3-c-sub-text"
+          },
+          "isStatic": true
+        }
+      ],
+      "logic": {
+        "uuid": "[object Object]-c-classB",
+        "rks": [
+          "idTest"
+        ]
+      }
+    },
+    {
+      "tagName": "text",
+      "attrs": {
+        "class": {
+          "type": "BinaryExpression",
+          "operator": "+",
+          "left": {
+            "type": "BinaryExpression",
+            "operator": "+",
+            "left": {
+              "type": "Literal",
+              "value": "classC"
+            },
+            "right": {
+              "type": "ConditionalExpression",
+              "test": {
+                "type": "Identifier",
+                "name": "fontColor"
+              },
+              "consequent": {
+                "type": "Literal",
+                "value": " font-color"
+              },
+              "alternate": {
+                "type": "Literal",
+                "value": ""
+              },
+              "mustache": true
+            }
+          },
+          "right": {
+            "type": "ConditionalExpression",
+            "test": {
+              "type": "Identifier",
+              "name": "bgColor"
+            },
+            "consequent": {
+              "type": "Literal",
+              "value": " bg-color"
+            },
+            "alternate": {
+              "type": "Literal",
+              "value": ""
+            },
+            "mustache": true
+          }
+        }
+      },
+      "logic": {
+        "uuid": "entry-s4",
+        "rks": [
+          "fontColor",
+          "bgColor"
+        ]
+      }
+    },
+    {
+      "tagName": "view",
+      "attrs": {
+        "class": {
+          "type": "BinaryExpression",
+          "operator": "+",
+          "left": {
+            "type": "Literal",
+            "value": "type-"
+          },
+          "right": {
+            "type": "ConditionalExpression",
+            "test": {
+              "type": "Identifier",
+              "name": "is1"
+            },
+            "consequent": {
+              "type": "Literal",
+              "value": "1"
+            },
+            "alternate": {
+              "type": "ConditionalExpression",
+              "test": {
+                "type": "Identifier",
+                "name": "is2"
+              },
+              "consequent": {
+                "type": "Literal",
+                "value": "2"
+              },
+              "alternate": {
+                "type": "Literal",
+                "value": "3"
+              },
+              "paren": true
+            },
+            "mustache": true
+          }
+        }
+      },
+      "logic": {
+        "uuid": "entry-s5-cl-type-",
+        "rks": [
+          "is1",
+          "is2"
+        ]
+      }
+    }
+  ],
+  "tagName": "template",
+  "logic": {
+    "uuid": "entry-s0",
+    "rks": [
+      "isBig",
+      "idTest",
+      "fontColor",
+      "bgColor",
+      "is1",
+      "is2"
+    ]
+  }
+}

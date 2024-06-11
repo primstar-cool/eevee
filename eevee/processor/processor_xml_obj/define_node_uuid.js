@@ -1,4 +1,4 @@
-module.exports = function defineNodeUUID(node, prefix, marker) {
+module.exports = function defineNodeUUID(node, prefix, marker, ignoreStaticSubNode = false) {
 
     var seriseId = 0;
 
@@ -30,7 +30,7 @@ module.exports = function defineNodeUUID(node, prefix, marker) {
             }
         }
 
-        if (node.childNodes) {
+        if (node.childNodes && (!ignoreStaticSubNode || !node.isStatic)) {
             node.childNodes.forEach(defineANodeUUID);
         }
     }

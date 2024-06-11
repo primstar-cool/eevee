@@ -45,11 +45,12 @@ module.exports = function standard2swan(
       destFilePath,
       rootSrcPath,
       mainClassName,
+      screenWidthRem,
       getIncludedStandardTreeFn,
       onFoundImportTemplateFn,
       onFoundEventHandlerFn,
       resolveAssetsPathFn,
-      cssDomain
+      cssDomain,
     } = {}
   ) {
 
@@ -87,7 +88,7 @@ module.exports = function standard2swan(
       }
 
       resolveTagImage(node);
-      transformStyleRem2Rpx(node, cssDomain);
+      transformStyleRem2Rpx(node, cssDomain, screenWidthRem);
 
       resolveAttrsLogicFor(node);
       resolveAttrsLogicIf(node);
@@ -551,9 +552,9 @@ module.exports = function standard2swan(
     }
   }
   
-  function transformStyleRem2Rpx(node, cssDomain) {
+  function transformStyleRem2Rpx(node, cssDomain, screenWidthRem) {
 
-    const replaceRem2Rpx = replaceRemT2Rpx(7.5);
+    const replaceRem2Rpx = replaceRemT2Rpx(screenWidthRem);
 
     if (node.attrs && node.attrs.style) {
       if (

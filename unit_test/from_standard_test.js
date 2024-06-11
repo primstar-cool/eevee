@@ -21,6 +21,8 @@ projPaths.forEach(
                 || v === 'arkts'
                 || v === 'react'
                 || v === 'react_native'
+                || v === 'mvvm'
+
             ))
             .forEach(
                 v => projDetailPath.push(pp + "/" + v)
@@ -95,6 +97,13 @@ projDetailPath.forEach(
             const standardToDestTool = require("../eevee/_from_standard/to_swan/standard_to_swan.js");
             destFileDict = standardToDestTool(eeveeData, {
                 env: "SWAN",
+                mainClassName: 'entry',
+            });
+            // debugger
+        } else if (n.endsWith('mvvm')) {
+            const standardToDestTool = require("../eevee/_from_standard/to_mvvm/standard_to_mvvm.js");
+            destFileDict = standardToDestTool(eeveeData, {
+                env: "MVVM",
                 mainClassName: 'entry',
             });
             // debugger

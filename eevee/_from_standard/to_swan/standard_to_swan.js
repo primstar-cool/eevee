@@ -21,7 +21,8 @@ module.exports = function (node,
     resolveAssetsPathFn: undefined, // function mapping local assets path (wxmp)
     getIncludedStandardTreeFn: undefined, // function how to get include tree, if stardtree does not  containe external-include tree.
     minifyCss: undefined,
-    minifyXml: undefined
+    minifyXml: undefined,
+    screenWidthRem: undefined
   }
   
   ) {
@@ -70,12 +71,15 @@ module.exports = function (node,
  
   
   /////////////////deal with template////////////////
+  let screenWidthRem = config.screenWidthRem;
+  if (screenWidthRem === undefined) screenWidthRem = 7.5;
   let referIncludeNode = [];
   require("./task/standard_to_swan_object.js")(templateNode, 
     {
       srcFilePath,
       destFilePath,
       mainClassName,
+      screenWidthRem,
       getIncludedStandardTreeFn: (node, src, parentSrc, rootSrcPath, rootDestPath) => {
         
         let retNode;

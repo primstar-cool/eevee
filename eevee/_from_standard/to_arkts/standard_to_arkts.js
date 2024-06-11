@@ -227,7 +227,7 @@ function _judgeWrapTextFn(nodeInfos, mergeFunc) {
       if (mergeArr.length >= 2) { // modify it as you wish
         mergeFunc(mergeArr);
       }        
-      mergeFunc = null;
+      mergeArr = [];
 
     }
 

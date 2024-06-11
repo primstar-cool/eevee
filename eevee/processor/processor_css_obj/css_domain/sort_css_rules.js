@@ -16,7 +16,7 @@ module.exports = function sort_css_rules(styleContent) {
                 let styleImportant;
 
                 let keys = Object.keys(co.style);
-                let importantKeys = (keys.filter(key => co.style[key].includes("!important")));
+                let importantKeys = (keys.filter(key => (typeof co.style[key] === 'string' && co.style[key].includes("!important"))));
                 // if (importantKeys.length) debugger
                 if (importantKeys.length === 0) return;
 
