@@ -146,8 +146,15 @@ projDetailPath.forEach(
                         fs.mkdirSync(dirToMk.pop())
                     }
 
-                    fs.writeFileSync(resultFile, destFileDict[fn], "utf8");
-                    console.log("save file: " + path.relative(unitTestPath, resultFile));
+                    if (fs.existsSync(resultFile) &&
+                        fs.readFileSync(resultFile, "utf8").replace(/\r\n/g, '\n') === destFileDict[fn].replace(/\r\n/g, '\n')
+                    ) {
+                        console.log("skip save file: " + path.relative(unitTestPath, resultFile));
+                    } else {
+                        fs.writeFileSync(resultFile, destFileDict[fn], "utf8");
+                        console.log("save file: " + path.relative(unitTestPath, resultFile));
+                    }
+                   
                 }
 
             )
@@ -166,8 +173,9 @@ projDetailPath.forEach(
                         let resultContent = fs.readFileSync(resultFile, "utf8");
                         let filenameInRel = path.relative(unitTestPath, resultFile);
 
-                        if (resultContent.replace(/\n/g, '\n') !== destFileDict[fn].replace(/\n/g, '\n')) {
+                        if (resultContent.replace(/\r\n/g, '\n') !== destFileDict[fn].replace(/\r\n/g, '\n')) {
                             console.error("file check error: " + filenameInRel)
+                            // debugger
                         } else {
                             console.log("file check succ: " + filenameInRel)
                         }
