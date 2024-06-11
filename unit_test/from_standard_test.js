@@ -166,7 +166,7 @@ projDetailPath.forEach(
                         let resultContent = fs.readFileSync(resultFile, "utf8");
                         let filenameInRel = path.relative(unitTestPath, resultFile);
 
-                        if (resultContent !== destFileDict[fn]) {
+                        if (resultContent.replace(/\n/g, '\n') !== destFileDict[fn].replace(/\n/g, '\n')) {
                             console.error("file check error: " + filenameInRel)
                         } else {
                             console.log("file check succ: " + filenameInRel)
