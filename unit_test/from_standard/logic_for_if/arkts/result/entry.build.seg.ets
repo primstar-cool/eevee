@@ -10,6 +10,7 @@ Column() {
       Column(/*entry-s2*/) {
         Text((("\n" + item2.text) + "\n") /*entry-s2::auto-text-0*/)
       }.width("100%"/*display block default*/)
+      .alignItems(HorizontalAlign.Start/*text-align undefined*/)
     },
     (item2) => (item2.id)
   )
@@ -23,6 +24,7 @@ Column() {
           }.width("100%"/*display block default*/)
           .alignItems(VerticalAlign.Top)
         }.width("100%"/*display block default*/)
+        .alignItems(HorizontalAlign.Start/*text-align undefined*/)
       }
     },
     (item3) => (item3.id3)
@@ -33,6 +35,7 @@ Column() {
         Column(/*entry-s9*/) {
           Text((((("\n" + item4.index) + ": ") + item4.text) + "\n") /*entry-s9::auto-text-0*/)
         }.width("100%"/*display block default*/)
+        .alignItems(HorizontalAlign.Start/*text-align undefined*/)
       },
       (item4) => (item4.id4)
     )
@@ -43,29 +46,33 @@ Column() {
         ForEach(item5.subArr,
           (item6, index) => {
             Flex({wrap: FlexWrap.Wrap} /*entry-s12*/) {
+              Text(""/*uuid="entry-s13::rich-text"*/
+              ) {
               ForEach(item6.subSubArr,
-                (item5, index) => {
-                  Text("conflict for-item name" /*entry-s13*/)
-                },
-                (item5) => (item5)
-              )
+                      (item5, index) => {
+                          Span("conflict for-item name" /*entry-s13*/)
+                      },
+                      (item5) => (item5)
+                    )
               ForEach(item6.subSubArr,
-                (item, index) => {
-                  Text("conflict for-index name" /*entry-s15*/)
-                },
-                (item) => (item)
-              )
+                      (item, index) => {
+                          Span("conflict for-index name" /*entry-s15*/)
+                      },
+                      (item) => (item)
+                    )
               ForEach(item6.subSubArr,
-                (item7, index7) => {
-                  Text("nothing conflict" /*entry-s17*/)
-                },
-                (item7) => (item7)
-              )
+                      (item7, index7) => {
+                          Span("nothing conflict" /*entry-s17*/)
+                      },
+                      (item7) => (item7)
+                    )
+              }
             }.width("100%"/*display block default*/)
           },
           (item6) => (item6.idSub)
         )
       }.width("100%"/*display block default*/)
+      .alignItems(HorizontalAlign.Start/*text-align undefined*/)
     },
     (item5) => (item5.id5)
   )
