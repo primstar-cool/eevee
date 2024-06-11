@@ -184,6 +184,30 @@ module.exports = function (node,
     );
     // cssDomain = new CssDomain({css: sortedCssRules});
 
+    sortedCssRules.forEach(
+      vo => {
+        if (vo.style) {
+          let styleNew = {};
+          let voStyle = vo.style;
+          let keys = Object.keys(voStyle);
+
+          keys.forEach(k => {
+
+            if (k.includes("-")) {
+              styleNew[k.replace(/-(\w)/g, ($,$1)=>$1.toUpperCase())] = voStyle[k];
+            } else {
+              styleNew[k] = voStyle[k];
+            }
+
+          });
+
+          vo.style = styleNew;
+        }
+      }
+    )
+
+    // debugger
+
     destFileDict[`${mainClassName}.mvvm-style.json`] = JSON.stringify(sortedCssRules, null, config.minifyJSON ? undefined : 2);
   }
   
