@@ -1,35 +1,38 @@
 
   Flex({wrap: FlexWrap.Wrap} /*entry-s1*/) {
+    Text(""/*uuid="entry-s2::rich-text"*/
+    ) {
     if (this.attr1) {
-      Text("single if" /*entry-s2*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("single if" /*entry-s2*/)
+        }
     if (this.attr2) {
-      Text("if with else if" /*entry-s4*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("if with else if" /*entry-s4*/)
+        }
     else if (this.attr3) {
-      Text("with else if bu no else" /*entry-s6*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("with else if bu no else" /*entry-s6*/)
+        }
     if (this.attr4) {
-      Text("if with else" /*entry-s8*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("if with else" /*entry-s8*/)
+        }
     else {
-      Text("else end" /*entry-s10*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("else end" /*entry-s10*/)
+        }
     if (this.attr5) {
-      Text("if with .. " /*entry-s12*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("if with .. " /*entry-s12*/)
+        }
     else if (this.attr6) {
-      Text("else if 6" /*entry-s14*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("else if 6" /*entry-s14*/)
+        }
     else if (this.attr7) {
-      Text("else if 7" /*entry-s16*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("else if 7" /*entry-s16*/)
+        }
     else if (this.attr8) {
-      Text("else if 8" /*entry-s18*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("else if 8" /*entry-s18*/)
+        }
     else {
-      Text("else end" /*entry-s20*/).backgroundColor(0xFF0000).height("100px").width("100px")
-    }
+            Span("else end" /*entry-s20*/)
+        }
+    }.backgroundColor(0xFF0000).height("100vp").width("100vp")
   }.backgroundColor(0x0000FF)
   .width("100%"/*display block default*/)
 
