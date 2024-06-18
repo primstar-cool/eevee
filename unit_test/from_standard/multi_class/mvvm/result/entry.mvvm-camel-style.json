@@ -56,7 +56,7 @@
       }
     ],
     "style": {
-      "background-color": "#FFC0CB"
+      "backgroundColor": "#FFC0CB"
     }
   },
   {
@@ -69,7 +69,7 @@
       }
     ],
     "style": {
-      "background-color": "#FF0000",
+      "backgroundColor": "#FF0000",
       "width": 300
     }
   },
@@ -83,11 +83,11 @@
       }
     ],
     "style": {
-      "background-color": "#0000FF",
-      "border-top-width": "2px",
-      "border-right-width": "2px",
-      "border-bottom-width": "2px",
-      "border-left-width": "2px"
+      "backgroundColor": "#0000FF",
+      "borderTopWidth": "2px",
+      "borderRightWidth": "2px",
+      "borderBottomWidth": "2px",
+      "borderLeftWidth": "2px"
     }
   },
   {
@@ -100,11 +100,11 @@
       }
     ],
     "style": {
-      "background-color": "#008000",
-      "margin-top": 75,
-      "margin-right": 75,
-      "margin-bottom": 75,
-      "margin-left": 75
+      "backgroundColor": "#008000",
+      "marginTop": 75,
+      "marginRight": 75,
+      "marginBottom": 75,
+      "marginLeft": 75
     }
   },
   {

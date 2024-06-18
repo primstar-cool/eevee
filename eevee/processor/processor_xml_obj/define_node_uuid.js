@@ -12,9 +12,11 @@ module.exports = function defineNodeUUID(node, prefix, marker, ignoreStaticSubNo
 
         if (!node.logic.uuid) {
            
+            // if (node.attrs &&typeof node.attrs.id === "object") debugger
+
             node.logic.uuid = {
                 type: "Literal",
-                value: (node.attrs && node.attrs.id) ? node.attrs.id : (marker + '-s' + (seriseId++))
+                value: (node.attrs && node.attrs.id && typeof node.attrs.id === 'string') ? node.attrs.id : (marker + '-s' + (seriseId++))
             }
             // debugger
             if (node.attrs && node.attrs.class) {

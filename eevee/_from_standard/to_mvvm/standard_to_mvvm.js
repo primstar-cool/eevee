@@ -182,6 +182,8 @@ module.exports = function (node,
         }
       }
     );
+    destFileDict[`${mainClassName}.mvvm-style.json`] = JSON.stringify(sortedCssRules, null, config.minifyJSON ? undefined : 2);
+
     // cssDomain = new CssDomain({css: sortedCssRules});
 
     sortedCssRules.forEach(
@@ -208,7 +210,7 @@ module.exports = function (node,
 
     // debugger
 
-    destFileDict[`${mainClassName}.mvvm-style.json`] = JSON.stringify(sortedCssRules, null, config.minifyJSON ? undefined : 2);
+    destFileDict[`${mainClassName}.mvvm-camel-style.json`] = JSON.stringify(sortedCssRules, null, config.minifyJSON ? undefined : 2);
   }
   
 

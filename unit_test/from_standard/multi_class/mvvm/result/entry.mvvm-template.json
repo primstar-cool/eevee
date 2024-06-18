@@ -83,13 +83,13 @@
             "class": "sub-text"
           },
           "logic": {
-            "uuid": "entry-s3-c-sub-text"
+            "uuid": "entry-s4-c-sub-text"
           },
           "isStatic": true
         }
       ],
       "logic": {
-        "uuid": "[object Object]-c-classB",
+        "uuid": "entry-s3-c-classB",
         "rks": [
           "idTest"
         ]
@@ -144,7 +144,7 @@
         }
       },
       "logic": {
-        "uuid": "entry-s4",
+        "uuid": "entry-s5",
         "rks": [
           "fontColor",
           "bgColor"
@@ -192,7 +192,7 @@
         }
       },
       "logic": {
-        "uuid": "entry-s5-cl-type-",
+        "uuid": "entry-s6-cl-type-",
         "rks": [
           "is1",
           "is2"

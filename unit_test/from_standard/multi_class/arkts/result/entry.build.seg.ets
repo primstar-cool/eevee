@@ -5,16 +5,16 @@ Column() {
   .width(this.isBig ? ("528lpx") : ("192lpx"))
   .height("192lpx")
   .alignItems(VerticalAlign.Top)
-  Row(/*[object Object]-c-classB*/) {
-    Text(/*entry-s3-c-sub-text*/)
+  Row(/*entry-s3-c-classB*/) {
+    Text(/*entry-s4-c-sub-text*/)
   }
   .width("96lpx")
   .height("96lpx")
   .alignItems(VerticalAlign.Top)
-  Text(/*entry-s4*/)
+  Text(/*entry-s5*/)
   .fontColor(this.fontColor ? (0xFFFF00) : undefined)
   .backgroundColor(this.bgColor ? (0xFFC0CB) : undefined)
-  Row(/*entry-s5*/)
+  Row(/*entry-s6*/)
   .width(this.is1 ? ("288lpx") : ("96lpx"))
   .height("96lpx")
   .backgroundColor({"@entry>view.type-1":(0xFF0000), "@entry>view.type-2":(0x0000FF), "@entry>view.type-3":(0x008000)}[("@entry>view" + this.genClassXPath(("type-" + (this.is1 ? ("1") : ((this.is2 ? ("2") : ("3")))))))])
