@@ -1,35 +1,18 @@
-
+const less = require('less');
 // const remove_untarget_platform_func = require("../processor/processor_wxss_string/remove_untarget_platform_func.js");
 const path = require("path");
 
 module.exports = function (
-  cssContent,
+  lessContent,
   filePath = undefined,
   rootSrcPath = undefined,
   readFileFn = null,
   hooks = {processBeforeParseStyle: null, processAfterParseStyle: null},
   processImport = true,
-  cssToObject = null,
+  reserveImport = false,
 ) {
-
-  if (!cssToObject) cssToObject = require("./parse_css_like/index.js");
-
-  if (hooks && hooks.processBeforeParseStyle) {
-      content = hooks.processBeforeParseStyle(cssContent);
-  }
-
-  if (!rootSrcPath && filePath) {
-    rootSrcPath = path.dirname(filePath);
-  }
-
+  
     // debugger
-    // if (cssPath.includes("home.wxsss")) debugger
-    // cssContent = remove_untarget_platform_func(cssContent, targetEnv)
-   
-    let allImportNodes = {
-      [filePath]: cssContent
-    }
-
     if (processImport) {
         if (!readFileFn) {
             readFileFn = function (absPath) {
@@ -42,78 +25,83 @@ module.exports = function (
         }     
     }
 
-    let resultNodes = [];
-    let processd = {};
-
-    while (resultNodes.length < Object.keys(allImportNodes).length) {
-      Object.keys(allImportNodes).forEach (key => {
-
-        if (processd[key]) return
-
-        let ret =  {
-          tagName: "style",
-          sourceType: key.substring(key.lastIndexOf(".") + 1),
-          styleContent: cssToObject(allImportNodes[key], /*{source: path.relative(rootSrcPath, key)}*/),
-          src: path.relative(rootSrcPath, key).replace(/\\/g, "/")
+    const wxssParser = require("./parse_wxss.js");
+    let cssContent = lessToCss(lessContent, filePath, rootSrcPath, reserveImport);
+    let result = wxssParser(cssContent, filePath, rootSrcPath, 
+        (absPath) => {
+            let lessContent = readFileFn(absPath);
+            let cssConvString = lessToCss(lessContent, absPath, rootSrcPath, reserveImport);
+            return cssConvString;
+            
         }
-        resultNodes.push(ret)
-        processd[key] = 1;
+        , hooks, processImport
+    );
 
-        if (processImport)
-          _findImport(allImportNodes[key], ret.styleContent, key, rootSrcPath, allImportNodes, readFileFn, processImport);
-        
-      });
-    }
-      
-
-    if (hooks && hooks.processAfterParseStyle) {
-      hooks.processAfterParseStyle(resultNodes);
-  }
-
-    return resultNodes;
+    return result;
 
 }
 
-function _findImport(cssContent, contentObject, filePath, rootSrcPath, allImportNodes, readFileFn, processImport) {
-  var importPath;
+function lessToCss(lessContent, filePath, rootSrcPath, reserveImport) {
 
-  if (contentObject && contentObject.stylesheet) {
-
-    if (contentObject.stylesheet.rules) {
-      contentObject.stylesheet.rules.forEach(
-        (r, index) => {
-          if (r.type === 'import') {
-            _onFindAImport(eval(r.import));
-          }
-        }
-      )
-    }
+    let replaceArr;
+    if (reserveImport) {
+        replaceArr = [];
+        lessContent = replaceImportToPh(lessContent, replaceArr);
+    }    
     
+    let cssConvString;
 
-  } else if (cssContent) {
+    less.render(
+        lessContent, 
+        {
+            filename: filePath,
+            paths: [rootSrcPath],
+            syncImport: true,
+        },
+        (err, output)=> {
+            // debugger
+
+            if (err) throw err;
+
+            cssConvString = output.css;
+        }
+    );
+
+    if (!cssConvString) throw new Error("conv less fail")
+
+    if (reserveImport) {
+        cssConvString = replacePhToImport(cssConvString, replaceArr);
+    }
+    return cssConvString;
+}
+
+function replaceImportToPh(cssContent, replaceArr) {
+
+    const importReserveKey = "SPEC_IPT_REV_" + Date.now();
 
     const regEpx = /@import\s+[\'|\"]([^\"^\']+)[\'|\"][;]*([^\n]*)/g;
     let r;
     while ((r = regEpx.exec(cssContent))) {
-      // debugger
-      _onFindAImport(r[1]);
-    
-    }
-  }
-
-  function _onFindAImport(inPath) {
-  
-    if (inPath.startsWith("/")) { 
-      importPath = path.resolve(rootSrcPath||'./', "." + inPath);
-    } else {
-      importPath = path.resolve(filePath ? path.dirname(filePath) : './', inPath);
+    //   debugger
+    //   _onFindAImport(r[1]);
+        replaceArr.push({raw:r[0]})
     }
 
-    if (!allImportNodes[importPath]) {
-      allImportNodes[importPath] = readFileFn(importPath);
-    }
-  }
+    replaceArr.forEach( v => {
+        if (!v.raw.startsWith("@import")) throw new Error("parse import error");
+        let newStr = "/*!" + importReserveKey + v.raw.substring(7) + "*/";
+        v.ph = newStr;
+        cssContent = cssContent.replace(v.raw, newStr);
+    });
+    return cssContent;
+}
 
+function replacePhToImport(cssConvString, replaceArr) {
+    replaceArr.forEach( v => {
+        cssConvString = cssConvString.replace(v.ph, v.raw);
+    });
+
+    return cssConvString;
 }
 
 // function _replaceImport(cssContent, fromPath, readFileFn, targetEnv) {

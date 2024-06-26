@@ -51,6 +51,9 @@ projDetailPath.forEach(
         } else if (n.endsWith('wxmp')) {
             let checkWxmlFileName = path.join(testProjPath, 'entry.wxml');
             let checkWxssFileName = path.join(testProjPath, 'entry.wxss');
+            let checkLessFileName = path.join(testProjPath, 'entry.less');
+
+            
             // debugger
 
             if (fs.existsSync(checkWxmlFileName)) {
@@ -66,11 +69,15 @@ projDetailPath.forEach(
                 }
 
                 if (fs.existsSync(checkWxssFileName)) {
-                    // const eeveeWxssResult = 
                     const wxssParser = require("../eevee/parser/parse_wxss.js");
                     let result = wxssParser(_readFileFunc(checkWxssFileName), checkWxssFileName, testProjPath, _readFileFunc, true);
                     eeveeResult.childNodes = eeveeResult.childNodes.concat(result)
+                } else if (fs.existsSync(checkLessFileName)) {
+                    const lessParser = require("../eevee/parser/parse_less.js");
+                    let result = lessParser(_readFileFunc(checkLessFileName), checkLessFileName, testProjPath, _readFileFunc, true);
+                    eeveeResult.childNodes = eeveeResult.childNodes.concat(result)
                 }
+    
 
                 eeveeResultString = JSON.stringify(eeveeResult, null, 2);
 
