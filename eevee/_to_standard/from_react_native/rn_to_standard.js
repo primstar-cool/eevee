@@ -13,7 +13,7 @@ module.exports = function (
     }
 
     // debugger
-    const tsAstNode = require("../../parser/parse_tsx.js")(content, filePath, rootSrcPath, readFileFunc);
+    const tsAstNode = require("../../parser/parse_tsx.js")(content, filePath);
     let xwmlObjectNode = require("./task/tsnode_to_tsxml_object.js")(tsAstNode, ["View", "Text", "Image"]);
     const stardNode =  require("./task/tsnode_to_standard.js")(xwmlObjectNode, tsAstNode);
 

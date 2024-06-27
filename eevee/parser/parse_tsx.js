@@ -1,7 +1,8 @@
 const ts = require("typescript"); 
 
 module.exports = function (
-    content,filePath
+    content,filePath,
+    ...args
 ) {
 
     // const { parseSync, transformSync } = require('@babel/core');
@@ -21,7 +22,7 @@ module.exports = function (
     // let ret2 = parseSync(content, options)
 
 
-    const sourceCode = ts.createSourceFile(filePath, content); 
+    const sourceCode = ts.createSourceFile.call(ts, filePath, content, ...args); 
     
     let simpleVisitAST = {
         tsNode: sourceCode,
