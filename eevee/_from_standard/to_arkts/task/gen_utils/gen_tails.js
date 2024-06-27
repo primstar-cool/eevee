@@ -1502,6 +1502,10 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
             case "box-sizing":
             case "flex-direction":
             case "flex-wrap":
+            case "justify-content":
+            case "align-content":
+            case "align-items":
+
               if (inlineMode) {
                 try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
               }

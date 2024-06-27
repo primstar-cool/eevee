@@ -31,7 +31,8 @@ module.exports = function standard2arkts(
       resolveAssetsPathFn,
       judgeWrapTextFn,
       cssDomain,
-      enableIterObject
+      enableIterObject,
+      tagMappingFn,
     } = {}
   ) {
 
@@ -87,7 +88,7 @@ module.exports = function standard2arkts(
     root._uuid = JSON.stringify(root.tagName)
     root.childNodes.forEach(
       (node, idx) => {
-          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeWrapTextFn}}).trim();
+          dest += genIndent(1) + genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncObjArr, depth: 1, styleHolder, cssDomain, enableIterObject, fns:{resolveAssetsPathFn, judgeWrapTextFn, tagMappingFn}}).trim();
           dest += (root.childNodes.length > 1 ? '\n' : '\n');
       }
     )
@@ -159,7 +160,7 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
   
   let indent = genIndent(depth);
   let indent_1 = indent + genIndent(1);
-  let indent_2 = indent_1 + genIndent(1);
+  // let indent_2 = indent_1 + genIndent(1);
   let tails = undefined;
   let ret;
 
@@ -250,26 +251,34 @@ function genSubNodeString(node, {sourceType, functionArray, ifReferArr, forFuncO
       }
     }
     
-    var destClassTagName = node._convertedTagName || {
-      view: "Flex",
-      text: "Text",
-      image: "Image",
-      page: "Flex",
-      div: "Flex",
-      span: "Text",
-      img: "Image",
-      body: "Flex",
+    var destClassTagName = node._convertedTagName;
+    
+    if (fns.tagMappingFn && !destClassTagName) 
+      destClassTagName = fns.tagMappingFn(node.tagName, node);
 
-      input: "TextInput",
-    }[node.tagName];
+    if (!destClassTagName) {
+      destClassTagName = {
+        view: "Flex",
+        text: "Text",
+        image: "Image",
+        page: "Flex",
+        div: "Flex",
+        span: "Text",
+        img: "Image",
+        body: "Flex",
 
+        input: "TextInput",
+      }[node.tagName];
+    }
+    
+      
     ASSERT(destClassTagName);
   
     if (node.tagName === 'span') {
       if (node.childNodes && node.childNodes.length == 1 && node.childNodes[0] && !node.childNodes[0].tagName) {
         destClassTagName = 'Text'
       }
-  }
+    }
    
     const newLineIndent = ifString ? indent_1 : indent;
     // const newLineIndent_1 = genIndent(1) + newLineIndent;

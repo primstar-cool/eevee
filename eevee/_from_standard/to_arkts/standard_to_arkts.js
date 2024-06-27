@@ -28,7 +28,8 @@ module.exports = function (node,
     functionPaths: undefined,
     functionInject: undefined,
     enableIterObject: undefined,
-    hapDesignWidth: 720
+    hapDesignWidth: 720,
+    tagMappingFn: undefined
   
 }) {
     
@@ -123,7 +124,6 @@ module.exports = function (node,
       require("../../processor/processor_css_obj/convertor/plugins_extra/padding_longhand.js")(),
       require("../../processor/processor_css_obj/convertor/plugins_extra/margin_longhand.js")(),
       require("../../processor/processor_css_obj/convertor/plugins_extra/overflow_longhand.js")(),
-
     ]
   );
 
@@ -182,16 +182,30 @@ module.exports = function (node,
       getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
       resolveAssetsPathFn: config.resolveAssetsPathFn,
       judgeWrapTextFn: config.judgeWrapTextFn  || _judgeWrapTextFn,
-      enableIterObject: config.enableIterObject
+      enableIterObject: config.enableIterObject,
+      tagMappingFn: config.tagMappingFn
     }
   );
 
-  let arktsString = arktsObj.main;
   // debugger
   destFileDict[`${mainClassName}.build.seg.ets`] = arktsObj.main;
 
   if (arktsObj.member) {
     destFileDict[`${mainClassName}.member.seg.ets`] = arktsObj.member;
+  }
+
+
+  let contextNodes =  node.childNodes.find(v=>v.tagName === 'context');
+
+  debugger
+  if (contextNodes && contextNodes.childNodes) {
+    const memberVars = contextNodes.childNodes.filter(v => v.tagName === 'identifier' && v.scope === "$$MEMBER__");
+
+    destFileDict[`${mainClassName}.state.seg.ets`] = memberVars.map(
+      v => `@State ${v.id}: ${v.type};`
+
+    ).join("\n")
+    
   }
 
 
