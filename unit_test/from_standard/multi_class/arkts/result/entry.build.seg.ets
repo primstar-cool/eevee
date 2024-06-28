@@ -8,6 +8,7 @@ Column() {
   Row(/*entry-s3-c-classB*/) {
     Text(/*entry-s4-c-sub-text*/)
   }
+  .id((this.idTest ? ("idT") : ("idF")) + "-extra")
   .width("96lpx")
   .height("96lpx")
   .alignItems(VerticalAlign.Top)

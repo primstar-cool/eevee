@@ -128,7 +128,7 @@ function resolveInclude(
         }
 
         // debugger
-        console.log(src)
+        // console.log(src)
         resolveInclude(includedRoot, {
           srcFilePath: path.join(srcFilePath ? path.dirname(srcFilePath) : './', src),
           destFilePath,
