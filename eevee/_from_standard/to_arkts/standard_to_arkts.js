@@ -220,7 +220,7 @@ module.exports = function (node,
           let kIndex = v.type.indexOf("{")
           if (kIndex === -1)
           {
-            return `@State ${v.id}: ${v.type} = ${dataString};`
+            return `@State ${v.id}: ${v.type} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");    
           } else { // simple quick mode
             let genType = `GenInterface_` + mainClassName + '_' + v.id;
             const genIndent = require("../../exporter/string_utils/gen_indent.js");
@@ -243,7 +243,7 @@ module.exports = function (node,
 
 
 
-            return `@State ${v.id}: ${genType} = ${dataString};`
+            return `@State ${v.id}: ${genType} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");
 
           }
         }
