@@ -213,7 +213,7 @@ module.exports = function (node,
         v => {
           let dataString = '';
           if (v.code) {
-            dataString = v.code.replace(new RegExp(`${v.id}[\\s]+=`), "");
+            dataString = v.code.replace(new RegExp(`${v.id}[\\s]+=[\\s]*`), "");
           }
           // debugger
 
@@ -236,6 +236,7 @@ module.exports = function (node,
               interfaceDef += fields.join("\n" + indent);
               interfaceDef += '\n}'
               typeDict[genType] = interfaceDef;
+              
             } else { // complex mode
               _genInterfaceByTypeLiteral(v.type, genType, typeDict);
               // debugger
@@ -280,7 +281,7 @@ function _genInterfaceByTypeLiteral(genType, typeName, typeDict) {
   _genAInterface(typeNode, typeName, typeDict);
 
   function _genAInterface(typeNode, nodeTypeName, typeDict) {
-    let interfaceDef = `interface ${nodeTypeName} {\n` + indent;
+    let interfaceDef = `interface ${nodeTypeName} {\n`;
 
     interfaceDef += typeNode.children.map(v => indent + _getAFieldType(v, nodeTypeName)).join("\n");
     interfaceDef += "\n}\n"
