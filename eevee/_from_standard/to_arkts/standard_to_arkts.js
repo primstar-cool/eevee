@@ -197,14 +197,67 @@ module.exports = function (node,
 
   let contextNodes =  node.childNodes.find(v=>v.tagName === 'context');
 
-  debugger
+  // debugger
   if (contextNodes && contextNodes.childNodes) {
-    const memberVars = contextNodes.childNodes.filter(v => v.tagName === 'identifier' && v.scope === "$$MEMBER__");
+    // debugger
+    let memberVars = contextNodes.childNodes.filter(v => v.tagName === 'identifier' );
+    // debugger
+    memberVars = memberVars.filter(v=>v.code && v.scope === "@CONTEXT__");
+    
+    if (memberVars.length) {
 
-    destFileDict[`${mainClassName}.state.seg.ets`] = memberVars.map(
-      v => `@State ${v.id}: ${v.type};`
+      let typeDict = {};
 
-    ).join("\n")
+
+      destFileDict[`${mainClassName}.state.seg.ets`] = memberVars.map(
+        v => {
+          let dataString = '';
+          if (v.code) {
+            dataString = v.code.replace(new RegExp(`${v.id}[\\s]+=[\\s]*`), "");
+          }
+          // debugger
+
+          let kIndex = v.type.indexOf("{")
+          if (kIndex === -1)
+          {
+            return `@State ${v.id}: ${v.type} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");    
+          } else { // simple quick mode
+            let genType = `GenInterface_` + mainClassName + '_' + v.id;
+            const genIndent = require("../../exporter/string_utils/gen_indent.js");
+            let indent = genIndent(1);
+            if (kIndex === v.type.lastIndexOf("{") || 0) {
+              let startIdx = v.type.indexOf("{") + 1;
+              let endIdx = v.type.lastIndexOf("}");
+              let objectLiterals = v.type.slice(startIdx, endIdx).trim();
+              
+              let interfaceDef = `interface ${genType} {\n` + indent;
+              let fields = objectLiterals.split(",");
+              fields = fields.map( v=> v.trim().replace(/[\s]*:[\s]*/, ': ') + ";");
+              interfaceDef += fields.join("\n" + indent);
+              interfaceDef += '\n}'
+              typeDict[genType] = interfaceDef;
+              
+            } else { // complex mode
+              _genInterfaceByTypeLiteral(v.type, genType, typeDict);
+              // debugger
+            }
+
+
+
+            return `@State ${v.id}: ${genType} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");
+
+          }
+        }
+      ).join("\n");
+
+      if (Object.keys(typeDict).length) {
+        destFileDict[`${mainClassName}.interface.seg.ets`] =
+         Object.keys(typeDict).map(
+          k => typeDict[k]
+        ).join("\n")
+      }
+    }
+    
     
   }
 
@@ -214,6 +267,53 @@ module.exports = function (node,
   }
 
   return destFileDict;
+}
+
+function _genInterfaceByTypeLiteral(genType, typeName, typeDict) {
+  // debugger
+  const tsAstNode = require("../../parser/parse_tsx.js")(`let tmp:` + genType + ";", "");
+
+  const typeNode = tsAstNode.children?.[0].children?.[0].children?.[0].children?.[1];
+  const genIndent = require("../../exporter/string_utils/gen_indent.js");
+  let indent = genIndent(1);
+ 
+  // debugger
+  _genAInterface(typeNode, typeName, typeDict);
+
+  function _genAInterface(typeNode, nodeTypeName, typeDict) {
+    let interfaceDef = `interface ${nodeTypeName} {\n`;
+
+    interfaceDef += typeNode.children.map(v => indent + _getAFieldType(v, nodeTypeName)).join("\n");
+    interfaceDef += "\n}\n"
+    typeDict[nodeTypeName] = interfaceDef;
+  }
+
+  function _getAFieldType(typeNode, nodeTypeName) {
+    ASSERT(typeNode.type === 'PropertySignature');
+
+    let fieldName = typeNode.children[0];
+    let fieldType = typeNode.children[1];
+
+    // debugger
+
+    ASSERT(fieldName.type === 'Identifier');
+   
+    fieldName = fieldName.text.trim();
+    
+    if (fieldType.type === "TypeLiteral") {
+      let newTypeName = nodeTypeName + "_" + fieldName;
+      _genAInterface(fieldType, newTypeName, typeDict)
+
+      return fieldName + ": " + newTypeName + ";"
+
+    } else {
+      return fieldName + ": " + fieldType.text.trim() + ";"
+
+    }
+
+  }
+
+
 }
 
 function _getIncludedStandardTree(node , src) {

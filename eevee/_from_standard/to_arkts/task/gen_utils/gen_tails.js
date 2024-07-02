@@ -25,6 +25,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     // if (node.tagName === "input") debugger
     // if (node.attrs?.id === 'bottom-info') debugger
 
+   
+
     let classDict = require("../../../helpers/gen_all_possible_style.js")(Object.assign({}, node, { childNodes: null }), cssDomain, false, true);
     let cssClassNames = Object.keys(classDict);
     let cssClassStyle;
@@ -33,6 +35,8 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     let elseCmds;
     
 
+   
+    
     ASSERT(node.computedStyle);
 
     if (cssClassNames.length === 0) {
@@ -199,7 +203,7 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
 
                 let mergedCondi;
-                debugger
+                // debugger
 
                 ASSERT(mergedCondiArr.length)
                 if (mergedCondiArr.length === 1) {
@@ -332,6 +336,14 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
     }
     
+    if (node.attrs?.id) {
+      // debugger
+      let idString = getSimpleValue(node.attrs.id, node, functionArray);
+      if (idString[0] !== '(') idString = "(" + idString + ")"
+      cmds.unshift(`.id${idString}`);
+      // debugger
+    }
+
     let inlineStyle = node.attrs?.style;
     if (inlineStyle) {
       // debugger
@@ -521,6 +533,17 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
     // if (node.className === "sn-name-text") debugger
 
     return {cmds:cmds, extraIf, elseCmds};
+  }
+
+  function getSimpleValue(obj , node , functionArray) {
+
+    
+    if (typeof obj === 'string') return JSON.stringify(obj);
+
+    if (obj.type === "MappedFunc") return functionArray[obj.fnId];
+    else return createMappedFunction.createFunctionReturnStr(obj).replace(/_cONTEXT./g, "this.");
+      
+      
   }
 
   function processPostion(position, node, cmds, extraIf, bool = undefined) {
