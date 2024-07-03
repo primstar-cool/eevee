@@ -208,6 +208,11 @@ module.exports = function (node,
 
       let typeDict = {};
 
+      let interfacePrefix = `GenInterface_` +  mainClassName + `_pageData`
+
+      let pageDataInterface = interfacePrefix + ' {';
+      const genIndent = require("../../exporter/string_utils/gen_indent.js");
+      let indent = genIndent(1);
 
       destFileDict[`${mainClassName}.state.seg.ets`] = memberVars.map(
         v => {
@@ -215,16 +220,16 @@ module.exports = function (node,
           if (v.code) {
             dataString = v.code.replace(new RegExp(`${v.id}[\\s]+=[\\s]*`), "");
           }
-          // debugger
+          debugger
 
           let kIndex = v.type.indexOf("{")
           if (kIndex === -1)
           {
-            return `@State ${v.id}: ${v.type} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");    
+            pageDataInterface += "\n" + indent + `${v.id}${v.question ? "?" : ""}: ${v.type};` + (v.comment ? " /*" + v.comment + "*/" : "");
+            return `@State ${v.id}: ${v.type} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");             
+
           } else { // simple quick mode
-            let genType = `GenInterface_` + mainClassName + '_' + v.id;
-            const genIndent = require("../../exporter/string_utils/gen_indent.js");
-            let indent = genIndent(1);
+            let genType = interfacePrefix + '_' + v.id;
             if (kIndex === v.type.lastIndexOf("{") || 0) {
               let startIdx = v.type.indexOf("{") + 1;
               let endIdx = v.type.lastIndexOf("}");
@@ -242,13 +247,38 @@ module.exports = function (node,
               // debugger
             }
 
-
+            pageDataInterface += "\n" + indent + `${v.id}${v.question ? "?" : ""}: ${genType};` + (v.comment ? " /*" + v.comment + "*/" : "");
 
             return `@State ${v.id}: ${genType} = ${dataString};` + (v.comment ? " /*" + v.comment + "*/" : "");
 
           }
         }
       ).join("\n");
+      pageDataInterface += "\n}\n";
+      typeDict[interfacePrefix] = "interface " + pageDataInterface;
+
+      let memberMethods = contextNodes.childNodes.filter(v => v.tagName === 'method' );
+      // debugger
+      memberMethods = memberMethods.filter(v=>v.code && v.scope === "@CONTEXT__");
+      
+      if (memberMethods.length) {
+
+        let interfacePrefix = `GenInterface_` +  mainClassName + `_pageMethods`
+
+        let pageMethodInterface = interfacePrefix + ' {';
+
+        // debugger
+
+        memberMethods.forEach(
+          v => {
+            pageMethodInterface += "\n" + indent + `${v.id}${v.question ? "?" : ""}: ${v.type};` + (v.comment ? " /*" + v.comment + "*/" : "");
+          }
+        );
+
+        pageMethodInterface += "\n}\n";
+        typeDict[interfacePrefix] = "interface " + pageMethodInterface;
+      }
+  
 
       if (Object.keys(typeDict).length) {
         destFileDict[`${mainClassName}.interface.seg.ets`] =
@@ -292,7 +322,8 @@ function _genInterfaceByTypeLiteral(genType, typeName, typeDict) {
     ASSERT(typeNode.type === 'PropertySignature');
 
     let fieldName = typeNode.children[0];
-    let fieldType = typeNode.children[1];
+    let fieldQuestion = typeNode.children.find(v=> v.type === 'QuestionToken')
+    let fieldType = typeNode.children[ fieldQuestion ? 2 : 1];
 
     // debugger
 
@@ -303,12 +334,10 @@ function _genInterfaceByTypeLiteral(genType, typeName, typeDict) {
     if (fieldType.type === "TypeLiteral") {
       let newTypeName = nodeTypeName + "_" + fieldName;
       _genAInterface(fieldType, newTypeName, typeDict)
-
-      return fieldName + ": " + newTypeName + ";"
+      return fieldName + (fieldQuestion ? "?: " : ": ") + newTypeName + ";"
 
     } else {
-      return fieldName + ": " + fieldType.text.trim() + ";"
-
+      return fieldName + (fieldQuestion ? "?: " : ": ") + fieldType.text.trim() + ";"
     }
 
   }
