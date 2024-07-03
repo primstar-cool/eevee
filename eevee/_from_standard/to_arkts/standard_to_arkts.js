@@ -254,9 +254,31 @@ module.exports = function (node,
           }
         }
       ).join("\n");
-
       pageDataInterface += "\n}\n";
-      typeDict[interfacePrefix] = pageDataInterface;
+      typeDict[interfacePrefix] = "interface " + pageDataInterface;
+
+      let memberMethods = contextNodes.childNodes.filter(v => v.tagName === 'method' );
+      // debugger
+      memberMethods = memberMethods.filter(v=>v.code && v.scope === "@CONTEXT__");
+      
+      if (memberMethods.length) {
+
+        let interfacePrefix = `GenInterface_` +  mainClassName + `_pageMethods`
+
+        let pageMethodInterface = interfacePrefix + ' {';
+
+        // debugger
+
+        memberMethods.forEach(
+          v => {
+            pageMethodInterface += "\n" + indent + `${v.id}${v.question ? "?" : ""}: ${v.type};` + (v.comment ? " /*" + v.comment + "*/" : "");
+          }
+        );
+
+        pageMethodInterface += "\n}\n";
+        typeDict[interfacePrefix] = "interface " + pageMethodInterface;
+      }
+  
 
       if (Object.keys(typeDict).length) {
         destFileDict[`${mainClassName}.interface.seg.ets`] =
