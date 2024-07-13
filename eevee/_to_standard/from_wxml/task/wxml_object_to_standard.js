@@ -82,7 +82,9 @@ module.exports = function wxml2standard(root, filePath, rootSrcPath) {
         attrValue.includes('{{') &&
         attrValue.includes('}}')
       ) {
-        node.data = mustache.parse(attrValue);
+        let attrValueTrim = attrValue.trim();
+        if (!(attrValueTrim.startsWith("<!--") && attrValueTrim.endsWith("-->")))
+          node.data = mustache.parse(attrValue);
       }
     }
 
