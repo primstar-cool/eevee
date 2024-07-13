@@ -114,8 +114,8 @@ module.exports = function standard2arkts(
 
   dest += (root.childNodes && root.childNodes.length === 1) ? `\n` : "}\n";
 
-  if (rootTail)
-    dest += rootTail.cmds.join(``) + "\n";
+  if (rootTail && rootTail.cmds.length)
+    dest += rootTail.cmds.join(``) + (dest.endsWith("\n") ? "\n" : "");
 
   
 
