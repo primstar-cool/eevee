@@ -4,7 +4,8 @@ const envKeys = require("../../config/target_platfrom_list.js");
 const javascript = require('../../parser/parse_ast/javascript/index.js');
 
 module.exports = function (node, targetEnv) {
-
+    if (!node) return;
+    
     var evalStringConst = "";
     envKeys.forEach(
         (key)=> {

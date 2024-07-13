@@ -1,6 +1,8 @@
 module.exports = appendParentNode;
 
 function appendParentNode(n, pn) {
+    if (!n) return;
+
     Object.defineProperty(
         n, "parentNode", {value: pn, enumerable: false, writable: true}
     );

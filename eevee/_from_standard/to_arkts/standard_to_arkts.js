@@ -70,7 +70,7 @@ module.exports = function (node,
   const processorCssObj = require("../../processor/processor_css_obj/convertor/index.js");
   let styleNodes =  node.childNodes.filter(v=>v.tagName === 'style');
 
-  styleNodes.unshift(
+  styleNodes && styleNodes.unshift(
     {
       tagName: 'style',
       styleContent: {
@@ -128,7 +128,7 @@ module.exports = function (node,
   );
 
 
-  styleNodes.forEach(
+  styleNodes && styleNodes.forEach(
     n=> {
         // if (n.convertedStyle) return;
         processorCssObj(n.styleContent, n.src, n.sourceType, config.env || "HARMONY", config.getImportedStyleContentFn || defaultGetImportedStyleContent(styleNodes, rootSrcPath), {inlineImport: true, splitImportant: true}, extraPlugin);
@@ -139,7 +139,7 @@ module.exports = function (node,
   // let cssResult = [];
   let cssDomain;
   let sortedCssRules;
-  if (styleNodes[0]) {
+  if (styleNodes && styleNodes[0]) {
     const CssDomain = require("../../processor/processor_css_obj/css_domain/css_domain.js");
     const sortCssRules  = require("../../processor/processor_css_obj/css_domain/sort_css_rules.js");
 
@@ -172,26 +172,28 @@ module.exports = function (node,
 
   // debugger
   /////////////////deal with template////////////////
-  let arktsObj= require("./task/standard_object_to_arkts.js")(templateNode, 
-    {
-      srcFilePath,
-      destFilePath,
-      rootSrcPath,
-      mainClassName,
-      cssDomain,
-      getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
-      resolveAssetsPathFn: config.resolveAssetsPathFn,
-      judgeWrapTextFn: config.judgeWrapTextFn  || _judgeWrapTextFn,
-      enableIterObject: config.enableIterObject,
-      tagMappingFn: config.tagMappingFn
+  if (templateNode) {
+    let arktsObj= require("./task/standard_object_to_arkts.js")(templateNode, 
+      {
+        srcFilePath,
+        destFilePath,
+        rootSrcPath,
+        mainClassName,
+        cssDomain,
+        getIncludedStandardTreeFn: config.getIncludedStandardTreeFn || _getIncludedStandardTree,
+        resolveAssetsPathFn: config.resolveAssetsPathFn,
+        judgeWrapTextFn: config.judgeWrapTextFn  || _judgeWrapTextFn,
+        enableIterObject: config.enableIterObject,
+        tagMappingFn: config.tagMappingFn
+      }
+    );
+
+    // debugger
+    destFileDict[`${mainClassName}.build.seg.ets`] = arktsObj.main;
+
+    if (arktsObj.member) {
+      destFileDict[`${mainClassName}.member.seg.ets`] = arktsObj.member;
     }
-  );
-
-  // debugger
-  destFileDict[`${mainClassName}.build.seg.ets`] = arktsObj.main;
-
-  if (arktsObj.member) {
-    destFileDict[`${mainClassName}.member.seg.ets`] = arktsObj.member;
   }
 
 
@@ -220,7 +222,7 @@ module.exports = function (node,
           if (v.code) {
             dataString = v.code.replace(new RegExp(`${v.id}[\\s]+=[\\s]*`), "");
           }
-          debugger
+          // debugger
 
           let kIndex = v.type.indexOf("{")
           if (kIndex === -1)
@@ -281,7 +283,7 @@ module.exports = function (node,
   
 
       if (Object.keys(typeDict).length) {
-        destFileDict[`${mainClassName}.interface.seg.ets`] =
+        destFileDict[`${mainClassName}.interface.seg.ts`] =
          Object.keys(typeDict).map(
           k => typeDict[k]
         ).join("\n")
