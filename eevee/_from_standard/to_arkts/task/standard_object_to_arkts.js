@@ -81,7 +81,25 @@ module.exports = function standard2arkts(
     _tmpStyleId: styleHolder.index++,
   }
     
-  dest = `Column() {\n`
+  let rootTail;
+  let rootIsRow = false;
+  if (sourceType === 'wxml' || sourceType === 'vue') {
+    // debugger
+    let rootCss = Object.assign({}, root);
+    rootCss.computedStyle = {};
+    rootCss.tagName = sourceType === 'wxml' ? 'page':'body';
+    rootTail = genTails(rootCss, functionArray, styleHolder, cssDomain, sourceType, true);
+
+    if (sourceType === 'wxml' && !rootTail.cmds.find(v=>v.startsWith(".width"))) {
+      rootTail.cmds.push(`.width("100%")`);
+      // user agent stylesheet
+
+    } 
+    rootIsRow = rootCss.computedStyle.flexDirection === 'row';
+    // debugger
+  }
+
+  dest = rootIsRow ? `Row() {\n` : `Column() {\n`
   if (root.childNodes) {
     if (root.childNodes.length === 1) dest = `\n`;
 
@@ -92,11 +110,14 @@ module.exports = function standard2arkts(
           dest += (root.childNodes.length > 1 ? '\n' : '\n');
       }
     )
-    
   }
 
   dest += (root.childNodes && root.childNodes.length === 1) ? `\n` : "}\n";
 
+  if (rootTail)
+    dest += rootTail.cmds.join(``) + "\n";
+
+  
 
   let destFunction = "";
   if (forFuncObjArr.length) {

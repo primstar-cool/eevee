@@ -77,3 +77,4 @@ Column() {
     (item5) => (item5.id5)
   )
 }
+.width("100%")

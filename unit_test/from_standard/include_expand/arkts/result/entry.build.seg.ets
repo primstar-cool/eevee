@@ -15,3 +15,4 @@ Column() {
   .width("720lpx")
   .height(0.5 * $$EXTERNAL_SCOPE__SCREEN_HEIGHT)
 }
+.width("100%")

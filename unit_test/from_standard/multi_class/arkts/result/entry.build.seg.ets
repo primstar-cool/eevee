@@ -24,3 +24,4 @@ Column() {
   .margin(((!this.is1 && !this.is2)) ? ({"bottom": "72lpx"}) : undefined)
   .margin(((!this.is1 && !this.is2)) ? ({"left": "72lpx"}) : undefined)
 }
+.width("100%")

@@ -1281,20 +1281,21 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
 
             if (inlineMode) {
               distVString = v;
-
               try {
                 computedStyle[nN] = JSON.parse(v);
-
               } catch (e) {
                 // debugger
                 computedStyle[nN] = javascript.parse(v).body[0].expression;
                 // ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )
               }
               
-
-
             } else {
-              distVString = convertLength(v);
+              
+              if (node && (node.tagName === 'page' || node.tagName === 'body') && n_n === 'height' && v.endsWith("vh")) {
+                distVString = '"' + v.substr(0, v.length - 2) + "%\"";
+              } else {
+                distVString = convertLength(v);
+              }
               computedStyle[nN] = v;
             }
 
@@ -1522,17 +1523,48 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
               // }
             
             break;
+            case "justify-content":
+              if (inlineMode) {
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              }
+              computedStyle[nN] = v;
+
+              ret.push(`.justifyContent(FlexAlign.${v[0].toUpperCase() + v.substr(1).replace(/-[\w\W]/g, (v) => v[1].toUpperCase())})`)
+              // debugger
+              break;
+            case "align-content":
+            case "align-items":
+              if (inlineMode) {
+                try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
+              }
+              computedStyle[nN] = v;
+              if (node._convertedTagName === 'Column') {
+                ret.push(`.${nN}(HorizontalAlign.${v[0].toUpperCase() + v.substr(1).replace(/-[\w\W]/g, (v) => v[1].toUpperCase())})`)
+              } else if (node._convertedTagName === 'Row') {
+                if (v === 'start') {
+                  ret.push(`.${nN}(VerticalAlign.Top)`)
+                } else if (v === 'center') {
+                  ret.push(`.${nN}(VerticalAlign.Center)`)
+                } else if (v === 'end') {
+                  ret.push(`.${nN}(VerticalAlign.Bottom)`)
+                }
+              }
+              // debugger
+
+            break;
             case "box-sizing":
             case "flex-direction":
             case "flex-wrap":
-            case "justify-content":
-            case "align-content":
-            case "align-items":
+            
 
               if (inlineMode) {
                 try {v = JSON.parse(v)} catch (e) {ASSERT(false, "not support dynamic style: " + n_n + ";" + e.toString() )}
               }
               computedStyle[nN] = v;
+
+              FlexAlign
+
+              debugger
 
             break;
             case "background-image":
@@ -1704,7 +1736,6 @@ module.exports = function genTails(node, functionArray, styleHolder, cssDomain, 
         }
       }
     );
-
 
     return ret;
 

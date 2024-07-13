@@ -15,3 +15,4 @@ Column() {
   }.width("100%"/*display block default*/)
   Text("multi node" /*entry-s11*/)
 }
+.width("100%")
